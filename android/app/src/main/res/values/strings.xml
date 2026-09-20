@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">네이버 열기</string>
+    <string name="chrome_not_found">Chrome 앱이 설치되어 있지 않아 기본 브라우저로 엽니다.</string>
+    <string name="no_browser">네이버를 열 수 있는 브라우저가 없습니다.</string>
+</resources>

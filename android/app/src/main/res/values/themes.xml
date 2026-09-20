@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        화면을 그리지 않는 투명 테마. 앱 아이콘을 누르면 UI 없이 곧장
+        크롬으로 넘어가므로 바로가기 아이콘처럼 동작한다.
+    -->
+    <style name="Theme.NaverLauncher" parent="@android:style/Theme.Translucent.NoTitleBar">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
+</resources>

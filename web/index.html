@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>네이버 크롬 런처</title>
+<meta name="description" content="탭 한 번으로 크롬 앱을 열고 그 안에서 네이버를 띄웁니다.">
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --card: #ffffff;
+    --text: #15171a;
+    --muted: #5f6570;
+    --line: #e3e6ea;
+    --brand: #03c75a;
+    --brand-ink: #ffffff;
+    --shadow: 0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #101215;
+      --card: #191c20;
+      --text: #f0f2f4;
+      --muted: #9aa2ad;
+      --line: #2a2f36;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #101215;
+    --card: #191c20;
+    --text: #f0f2f4;
+    --muted: #9aa2ad;
+    --line: #2a2f36;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard",
+                 "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+  main {
+    width: 100%;
+    max-width: 420px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    padding: 28px 24px 24px;
+  }
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: var(--brand);
+    color: var(--brand-ink);
+    font-weight: 800;
+    font-size: 22px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  h1 {
+    font-size: 21px;
+    line-height: 1.35;
+    margin: 16px 0 6px;
+    letter-spacing: -0.02em;
+  }
+  p.sub {
+    margin: 0 0 22px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  button.go {
+    width: 100%;
+    appearance: none;
+    border: 0;
+    border-radius: 12px;
+    background: var(--brand);
+    color: var(--brand-ink);
+    font-size: 16px;
+    font-weight: 700;
+    padding: 15px 16px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: transform .06s ease, filter .15s ease;
+  }
+  button.go:hover { filter: brightness(1.05); }
+  button.go:active { transform: scale(.985); }
+  button.go:focus-visible { outline: 3px solid color-mix(in srgb, var(--brand) 45%, transparent); outline-offset: 2px; }
+
+  a.fallback {
+    display: block;
+    text-align: center;
+    margin-top: 12px;
+    color: var(--muted);
+    font-size: 13px;
+    text-decoration: none;
+    padding: 8px;
+  }
+  a.fallback:hover { text-decoration: underline; }
+
+  .status {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.6;
+    min-height: 1.6em;
+  }
+  .status b { color: var(--text); font-weight: 600; }
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    background: color-mix(in srgb, var(--text) 7%, transparent);
+    padding: 1px 5px;
+    border-radius: 5px;
+  }
+</style>
+</head>
+<body>
+<main>
+  <div class="logo" aria-hidden="true">N</div>
+  <h1>크롬으로 네이버 열기</h1>
+  <p class="sub">아래 버튼을 누르면 휴대폰의 <b>Chrome 앱</b>이 실행되고, 그 안에서 네이버가 열립니다.</p>
+
+  <button class="go" id="go" type="button">Chrome에서 네이버 열기</button>
+  <a class="fallback" id="plain" href="https://www.naver.com" rel="noopener">크롬이 안 열리면 → 기본 브라우저로 열기</a>
+
+  <div class="status" id="status" role="status" aria-live="polite"></div>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  var TARGET_URL  = "https://www.naver.com";
+  var TARGET_HOST = "www.naver.com";
+
+  var ua        = navigator.userAgent || "";
+  var isAndroid = /Android/i.test(ua);
+  var isIOS     = /iPad|iPhone|iPod/i.test(ua) ||
+                  (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+  var statusEl = document.getElementById("status");
+  var goEl     = document.getElementById("go");
+
+  function say(html) { statusEl.innerHTML = html; }
+
+  // Android: intent: 스킴으로 Chrome 패키지를 직접 지정해 실행.
+  // 크롬이 없으면 browser_fallback_url 로 기본 브라우저가 대신 연다.
+  function androidIntentUrl() {
+    return "intent://" + TARGET_HOST + "/#Intent;" +
+           "scheme=https;" +
+           "package=com.android.chrome;" +
+           "action=android.intent.action.VIEW;" +
+           "S.browser_fallback_url=" + encodeURIComponent(TARGET_URL) + ";" +
+           "end";
+  }
+
+  // iOS: Chrome 앱의 커스텀 스킴. https 는 googlechromes, http 는 googlechrome.
+  function iosChromeUrl() {
+    return "googlechromes://" + TARGET_HOST + "/";
+  }
+
+  function openViaHiddenFrame(url) {
+    var frame = document.createElement("iframe");
+    frame.style.display = "none";
+    frame.src = url;
+    document.body.appendChild(frame);
+    setTimeout(function () {
+      if (frame.parentNode) { frame.parentNode.removeChild(frame); }
+    }, 1500);
+  }
+
+  function launch() {
+    if (isAndroid) {
+      say("Chrome 앱을 실행하는 중…");
+      window.location.href = androidIntentUrl();
+      return;
+    }
+
+    if (isIOS) {
+      say("Chrome 앱을 실행하는 중…");
+
+      // 앱 전환이 성공하면 문서가 숨겨진다. 그대로 남아 있으면 크롬 미설치로 보고 폴백.
+      var bailed = false;
+      function cancelFallback() { bailed = true; }
+      document.addEventListener("visibilitychange", cancelFallback, { once: true });
+      window.addEventListener("pagehide", cancelFallback, { once: true });
+
+      openViaHiddenFrame(iosChromeUrl());
+      window.location.href = iosChromeUrl();
+
+      setTimeout(function () {
+        if (bailed || document.hidden) { return; }
+        say("Chrome 앱이 없는 것 같습니다. 기본 브라우저로 엽니다…");
+        window.location.href = TARGET_URL;
+      }, 1400);
+      return;
+    }
+
+    // 데스크톱: 웹페이지에서 특정 브라우저를 강제 실행할 방법이 없다.
+    say("PC에서는 브라우저를 지정해 실행할 수 없습니다. " +
+        "새 탭에서 네이버를 엽니다. 크롬 실행까지 필요하면 " +
+        "<code>scripts/open-naver.sh</code> 를 사용하세요.");
+    window.open(TARGET_URL, "_blank", "noopener");
+  }
+
+  goEl.addEventListener("click", launch);
+
+  if (isAndroid)      { say("감지된 기기: <b>Android</b> — Chrome 패키지를 직접 호출합니다."); }
+  else if (isIOS)     { say("감지된 기기: <b>iOS</b> — Chrome 앱 스킴으로 전환합니다."); }
+  else                { say("감지된 기기: <b>PC</b> — 모바일에서 열어야 Chrome 앱이 실행됩니다."); }
+})();
+</script>
+</body>
+</html>
