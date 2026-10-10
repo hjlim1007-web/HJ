@@ -68,6 +68,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font-body);line-hei
   font-family:var(--font-mono);font-size:24px;font-weight:600;font-variant-numeric:tabular-nums}
 .slot.empty{color:var(--line);border-bottom-color:var(--line)}
 .slot.on{border-bottom-color:var(--clay)}
+.slot.fire{border-bottom-color:var(--field);animation:fire .2s ease}
+@keyframes fire{from{transform:translateY(-3px)}to{transform:none}}
 .keys{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:216px;margin:0 auto}
 button{font:inherit;color:inherit;cursor:pointer}
 .key{height:40px;border:1px solid var(--line);background:var(--bg);border-radius:2px;
@@ -75,12 +77,11 @@ button{font:inherit;color:inherit;cursor:pointer}
 .key:hover:not(:disabled){background:var(--sheet);border-color:var(--ink)}
 .key:active:not(:disabled){transform:translateY(1px)}
 .key:disabled{color:var(--line);background:transparent;cursor:not-allowed}
-.acts{display:flex;gap:6px;max-width:216px;margin:8px auto 0}
-.acts button{flex:1;padding:9px 8px;border-radius:2px;border:1px solid var(--ink);
-  font-weight:600;font-size:13px;letter-spacing:.02em}
-.acts .go{background:var(--field);border-color:var(--field);color:#f7f8f3}
-.acts .go:disabled{opacity:.45;cursor:not-allowed}
-.acts .clr{background:transparent}
+.acts{display:flex;max-width:216px;margin:8px auto 0}
+.acts button{flex:1;padding:9px 8px;border-radius:2px;border:1px solid var(--line);
+  background:transparent;color:var(--muted);font-weight:600;font-size:12.5px;letter-spacing:.02em}
+.acts button:hover:not(:disabled){border-color:var(--ink);color:var(--ink)}
+.acts button:disabled{opacity:.4;cursor:not-allowed}
 .msg{margin:10px 0 0;min-height:19px;font-size:12.5px;color:var(--clay);font-weight:500;text-align:center}
 
 /* 기록 */
@@ -136,7 +137,7 @@ tr.new td{animation:slide .22s ease both}
   <header class="board">
     <div>
       <h1>숫자야구 전광판</h1>
-      <p class="sub">서로 다른 숫자를 맞혀 9이닝 안에 경기를 끝내세요</p>
+      <p class="sub">서로 다른 숫자를 맞혀 9이닝 안에 경기를 끝내세요 · 마지막 자리를 누르면 자동 투구</p>
     </div>
     <div class="spacer"></div>
     <div class="gauges">
@@ -159,8 +160,7 @@ tr.new td{animation:slide .22s ease both}
       <div class="slots" id="slots" aria-label="입력한 숫자"></div>
       <div class="keys" id="keys"></div>
       <div class="acts">
-        <button type="button" class="clr" id="clear">지우기</button>
-        <button type="button" class="go" id="submit" disabled>투구</button>
+        <button type="button" id="clear">지우기</button>
       </div>
       <p class="msg" id="msg" role="status" aria-live="polite"></p>
       <div class="setup" style="margin-top:14px">
@@ -179,7 +179,7 @@ tr.new td{animation:slide .22s ease both}
         <thead><tr><th>회</th><th>투구</th><th style="text-align:right">판정</th></tr></thead>
         <tbody id="log"></tbody>
       </table>
-      <p class="idle" id="idle">1회 선두타자 타석. 1~9 중 서로 다른 숫자 세 개를 눌러 보세요.</p>
+      <p class="idle" id="idle">1회 선두타자 타석. 1~9 중 서로 다른 숫자를 누르면 마지막 자리에서 바로 투구됩니다.</p>
       <p class="rules">
         <b>스트라이크</b> 숫자와 자리가 모두 맞음 · <b>볼</b> 숫자는 있으나 자리가 다름 · <b>아웃</b> 맞는 숫자 없음<br>
         정답에 0은 쓰지 않고, 같은 숫자는 두 번 나오지 않습니다.
@@ -193,7 +193,7 @@ tr.new td{animation:slide .22s ease both}
 (function(){
   "use strict";
   var DIGITS = [1,2,3,4,5,6,7,8,9];
-  var state = { len:3, innings:9, secret:"", input:[], history:[], over:false, won:false };
+  var state = { len:3, innings:9, secret:"", input:[], history:[], over:false, won:false, pending:false };
   var permCache = {};
 
   function perms(len){
@@ -258,6 +258,7 @@ tr.new td{animation:slide .22s ease both}
     state.history = [];
     state.over = false;
     state.won = false;
+    state.pending = false;
     render();
   }
 
@@ -276,7 +277,7 @@ tr.new td{animation:slide .22s ease both}
     for (var i=0;i<state.len;i++){
       var cell = document.createElement("div");
       var v = state.input[i];
-      cell.className = "slot " + (v ? "on" : "empty");
+      cell.className = "slot " + (v ? (state.pending ? "on fire" : "on") : "empty");
       cell.textContent = v ? String(v) : "·";
       elSlots.appendChild(cell);
     }
@@ -312,10 +313,9 @@ tr.new td{animation:slide .22s ease both}
     var used = {};
     state.input.forEach(function(v){ used[v] = 1; });
     Array.prototype.forEach.call(elKeys.children, function(k){
-      k.disabled = state.over || !!used[k.dataset.digit] || state.input.length >= state.len;
+      k.disabled = state.over || state.pending || !!used[k.dataset.digit] || state.input.length >= state.len;
     });
-    $("submit").disabled = state.over || state.input.length !== state.len;
-    $("clear").disabled = state.over;
+    $("clear").disabled = state.over || state.pending || state.input.length === 0;
 
     var n = state.history.length ? candidates() : perms(state.len).length;
     $("cand-label").textContent = "가능한 정답 " + n.toLocaleString("ko-KR") + "개";
@@ -350,19 +350,27 @@ tr.new td{animation:slide .22s ease both}
   function say(text){ $("msg").textContent = text || ""; }
 
   function press(d){
-    if (state.over) return;
+    if (state.over || state.pending) return;
     if (state.input.length >= state.len) return;
     if (state.input.indexOf(d) !== -1) { say("같은 숫자는 한 번만 쓸 수 있습니다."); return; }
     state.input.push(d);
     say("");
-    render();
+    if (state.input.length === state.len){
+      state.pending = true;
+      render();
+      setTimeout(function(){ state.pending = false; submit(); }, 200);
+    } else {
+      render();
+    }
   }
 
   function submit(){
     if (state.over || state.input.length !== state.len) return;
     var guess = state.input.join("");
     if (state.history.some(function(h){ return h.guess === guess; })){
-      say(guess.split("").join(" ") + "은 이미 던진 공입니다.");
+      say(guess.split("").join(" ") + "은 이미 던진 공입니다. 다시 입력하세요.");
+      state.input = [];
+      render();
       return;
     }
     var r = judge(state.secret, guess);
@@ -387,7 +395,6 @@ tr.new td{animation:slide .22s ease both}
     if (b && !b.disabled) press(Number(b.dataset.digit));
   });
   $("clear").addEventListener("click", function(){ state.input = []; say(""); render(); });
-  $("submit").addEventListener("click", submit);
   $("again").addEventListener("click", function(){ reset(state.len); say(""); });
   Array.prototype.forEach.call(document.querySelectorAll(".seg button"), function(b){
     b.addEventListener("click", function(){ reset(Number(b.dataset.len)); say(""); });
@@ -395,15 +402,15 @@ tr.new td{animation:slide .22s ease both}
   document.addEventListener("keydown", function(e){
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     if (e.key >= "1" && e.key <= "9") { press(Number(e.key)); e.preventDefault(); }
-    else if (e.key === "Backspace") { if (!state.over) { state.input.pop(); say(""); render(); } e.preventDefault(); }
-    else if (e.key === "Enter") { state.over ? reset(state.len) : submit(); e.preventDefault(); }
+    else if (e.key === "Backspace") { if (!state.over && !state.pending) { state.input.pop(); say(""); render(); } e.preventDefault(); }
+    else if (e.key === "Enter") { if (state.over) reset(state.len); e.preventDefault(); }
   });
 
   function start(data){
     if (data && data.secret && data.secret.length){
       state.len = data.len; state.innings = data.innings; state.secret = data.secret;
       state.input = data.input || []; state.history = data.history || [];
-      state.over = !!data.over; state.won = !!data.won;
+      state.over = !!data.over; state.won = !!data.won; state.pending = false;
       render();
     } else {
       reset(3);
