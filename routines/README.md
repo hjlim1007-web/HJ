@@ -7,7 +7,7 @@ Routine 프롬프트는 Routine 설정 안에만 있으면 변경 이력이 남�
 |---|---|---|---|---|
 | `morning-briefing.md` | 아침 통합 브리핑 — 경제·보험·세무 | `0 23 * * *` UTC = **08:00 KST** | 메일 1통 | `trig_01V94gty1FiT2gGfApxpkT53` |
 | `dept-monitoring.md` | 부서별 데일리 모니터링 | `25 23 * * *` UTC = **08:25 KST** | 설정에 따라 1~6통 | `trig_014sDLa1VZYiPpaUHGVc2XFX` |
-| `deadline-alert.md` | 마감 D-day 알림 | `CRON_TZ=Asia/Seoul 43 7 * * *` = **07:43 KST** | 걸린 항목이 있는 날만 1통 | `trig_0147RjGRd6CYAxi9gLp24PLz` |
+| `deadline-alert.md` | 마감 D-day 알림 | `CRON_TZ=Asia/Seoul 43 7 * * *` = **07:43 KST** | 걸린 항목이 있는 날만 1통 | `trig_0147RjGRd6CYAxi9gLp24PLz` **(꺼둠)** |
 | (계획) `reg-tracker.md` | 규제·제도 원문 추적 | 월요일 **07:47 KST** | 주 1통 | — |
 | (계획) `market-monthly.md` | 월간 자금시장 리뷰 | 매월 2일 **08:27 KST** | 월 1통 | — |
 
@@ -32,15 +32,37 @@ Routine 프롬프트는 Routine 설정 안에만 있으면 변경 이력이 남�
   (기존에는 웹 검색만). 이번 주 캘린더를 `due.py --all` 출력으로 쓸 수 있게 하고, `verified: false`
   항목에 `미검증`을 붙이도록 했다.
 
-## 마감 알림 루틴 — Gmail 커넥터를 붙여야 메일이 나간다
+## 마감 알림 루틴 — 켜기 전에 두 가지를 붙여야 한다
 
-`마감 D-day 알림`(`trig_0147RjGRd6CYAxi9gLp24PLz`)은 도구로 등록했기 때문에 **커넥터가 비어 있다.**
-이 계정의 조직에서는 `create_trigger`로 커넥터를 전달할 수 없다(도구가 거부한다). 그래서 이 루틴이
-띄우는 세션에는 Gmail 도구가 없고, 산출은 되지만 **메일이 나가지 않는다.**
+`마감 D-day 알림`(`trig_0147RjGRd6CYAxi9gLp24PLz`)은 **현재 꺼져 있다.** 도구(`create_trigger`)로
+등록한 루틴이 띄우는 세션에 아래 두 가지가 없어 아무것도 하지 못하기 때문이다. 검증 실행 2회로
+확인했다.
 
-붙이는 방법 — claude.ai의 Routines 화면에서 이 루틴을 열고 Gmail 커넥터를 추가한다.
-`아침 통합 브리핑` 루틴에는 Gmail·Claude_Docs·Claude_Code_Remote가 붙어 있으므로 같은 방식으로 된다.
-붙기 전까지 이 루틴은 채팅 답변에만 결과를 남기고, 메일을 보내지 못한 사유를 밝힌다.
+| 빠진 것 | 증상 | 결과 |
+|---|---|---|
+| **소스 저장소** | 세션 태그에 `config:no-git-repo`, `/home/user/HJ`가 없음 | `scripts/due.py`를 돌릴 수 없다 |
+| **Gmail 커넥터** | `mcp__Gmail__send_message`가 세션 도구 목록에 없음 | 메일을 보낼 수 없다 |
+
+이 조직에서는 `create_trigger`에 `connectors`를 넘길 수 없고(도구가 거부한다),
+`sources`도 넘길 수단이 없다. 세션이 스스로 `add_repo`로 저장소를 붙이는 우회도 시도했으나
+그 도구 역시 띄워진 세션에 없었다.
+
+### 붙이는 방법
+
+claude.ai의 **Routines** 화면에서 이 루틴을 열고 두 가지를 설정한다.
+
+1. 소스 저장소에 `hjlim1007-web/HJ`를 추가하고 브랜치를 `claude/elegant-cori-7vpkd8`로 둔다.
+   (브랜치를 `main`에 병합한 뒤라면 `main`으로 두어도 된다 — 그때는 루틴 프롬프트 0장의
+   브랜치 지정도 함께 지운다.)
+2. Gmail 커넥터를 추가한다. `아침 통합 브리핑` 루틴에 Gmail·Claude_Docs·Claude_Code_Remote가
+   붙어 있으므로 같은 방식으로 된다.
+
+그 다음 루틴을 켜고, cron을 기다리지 말고 한 번 즉시 실행해 메일 수신과 아이폰 조판을 확인한다.
+
+### 검증 실행에서 확인된 것
+
+실패 상황에서 루틴이 **기한을 손계산으로 지어내지 않고 멈춰 보고했다.** 설계 의도대로다 —
+`scripts/due.py` 출력만을 근거로 삼는 규칙이 지켜졌다.
 
 ## 알려진 환경 제약
 
