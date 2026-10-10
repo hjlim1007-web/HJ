@@ -6,6 +6,29 @@ cron: `CRON_TZ=Asia/Seoul 43 7 * * *`
 이 알림의 생명은 **소음이 없는 것**이다. 걸린 항목이 없으면 메일도 푸시도 보내지 않는다.
 매일 오는 알림은 읽히지 않는다.
 
+## 0. 저장소 준비
+
+루틴이 띄우는 세션에는 **저장소가 붙어 있지 않다.** 직접 가져와야 한다.
+
+1. `mcp__claude-code-remote__add_repo`를 `owner: "hjlim1007-web"`, `repo: "HJ"`로 호출한다.
+   (도구가 목록에 없으면 `ToolSearch`로 `select:mcp__claude-code-remote__add_repo`를 불러온다.)
+   **먼저 curl이나 `gh repo view`로 저장소 존재를 확인하지 않는다** — 비공개 저장소는 404가 떠서
+   도구를 건너뛰게 만든다. 바로 호출하고 결과를 본다.
+2. 결과가 주는 clone 명령으로 `/home/user/HJ`에 가져온다. 브랜치를 지정한다.
+
+   ```bash
+   git clone -b claude/elegant-cori-7vpkd8 <결과가 준 URL> /home/user/HJ
+   ```
+3. 이미 `/home/user/HJ`가 있으면 클론하지 않고 브랜치만 맞춘다.
+
+   ```bash
+   cd /home/user/HJ && git fetch origin claude/elegant-cori-7vpkd8 \
+     && git checkout claude/elegant-cori-7vpkd8 && git pull origin claude/elegant-cori-7vpkd8
+   ```
+
+네트워크 오류로 실패하면 2초·4초·8초·16초 간격으로 최대 4회 다시 시도한다. 그래도 저장소를
+가져오지 못하면 **그 사실만 보고하고 종료한다.** 기한을 기억이나 손계산으로 만들어 보내지 않는다.
+
 ## 1. 산출
 
 ```bash
