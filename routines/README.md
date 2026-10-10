@@ -7,7 +7,7 @@ Routine 프롬프트는 Routine 설정 안에만 있으면 변경 이력이 남�
 |---|---|---|---|---|
 | `morning-briefing.md` | 아침 통합 브리핑 — 경제·보험·세무 | `0 23 * * *` UTC = **08:00 KST** | 메일 1통 | `trig_01V94gty1FiT2gGfApxpkT53` |
 | `dept-monitoring.md` | 부서별 데일리 모니터링 | `25 23 * * *` UTC = **08:25 KST** | 설정에 따라 1~6통 | `trig_014sDLa1VZYiPpaUHGVc2XFX` |
-| `deadline-alert.md` | 마감 D-day 알림 | `CRON_TZ=Asia/Seoul 43 7 * * *` = **07:43 KST** | 걸린 항목이 있는 날만 1통 | (등록 후 기입) |
+| `deadline-alert.md` | 마감 D-day 알림 | `CRON_TZ=Asia/Seoul 43 7 * * *` = **07:43 KST** | 걸린 항목이 있는 날만 1통 | `trig_0147RjGRd6CYAxi9gLp24PLz` |
 | (계획) `reg-tracker.md` | 규제·제도 원문 추적 | 월요일 **07:47 KST** | 주 1통 | — |
 | (계획) `market-monthly.md` | 월간 자금시장 리뷰 | 매월 2일 **08:27 KST** | 월 1통 | — |
 
@@ -31,6 +31,16 @@ Routine 프롬프트는 Routine 설정 안에만 있으면 변경 이력이 남�
 - `dept-monitoring.md`: 공휴일 판단에 `data/holidays.yaml` / `scripts/due.py`를 먼저 보도록 했다
   (기존에는 웹 검색만). 이번 주 캘린더를 `due.py --all` 출력으로 쓸 수 있게 하고, `verified: false`
   항목에 `미검증`을 붙이도록 했다.
+
+## 마감 알림 루틴 — Gmail 커넥터를 붙여야 메일이 나간다
+
+`마감 D-day 알림`(`trig_0147RjGRd6CYAxi9gLp24PLz`)은 도구로 등록했기 때문에 **커넥터가 비어 있다.**
+이 계정의 조직에서는 `create_trigger`로 커넥터를 전달할 수 없다(도구가 거부한다). 그래서 이 루틴이
+띄우는 세션에는 Gmail 도구가 없고, 산출은 되지만 **메일이 나가지 않는다.**
+
+붙이는 방법 — claude.ai의 Routines 화면에서 이 루틴을 열고 Gmail 커넥터를 추가한다.
+`아침 통합 브리핑` 루틴에는 Gmail·Claude_Docs·Claude_Code_Remote가 붙어 있으므로 같은 방식으로 된다.
+붙기 전까지 이 루틴은 채팅 답변에만 결과를 남기고, 메일을 보내지 못한 사유를 밝힌다.
 
 ## 알려진 환경 제약
 
