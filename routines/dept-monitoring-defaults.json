@@ -1,0 +1,28 @@
+{
+  "_comment": [
+    "부서별 데일리 모니터링 루틴의 폴백 설정.",
+    "루틴은 먼저 설정 Artifact(config/monitoring)를 읽고, 읽지 못했을 때만 이 파일을 쓴다.",
+    "이 파일로 실행한 회차는 브리핑 각주에 그 사실을 한 줄 남긴다.",
+    "2026-10-10 기준 Artifact 설정값과 동일하게 맞춰 두었다."
+  ],
+  "emailEnabled": true,
+  "emailMode": "combined",
+  "recipients": ["hjlim1007@naver.com"],
+  "departments": {
+    "finance": true,
+    "treasury": true,
+    "actuarial": true,
+    "product": true,
+    "it": false,
+    "risk": true,
+    "comp": true,
+    "hr": false,
+    "compliance": false,
+    "policy": false,
+    "claim": false,
+    "uw": false,
+    "general": true,
+    "separate": true,
+    "consumer": false
+  }
+}

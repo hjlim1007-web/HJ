@@ -1,0 +1,83 @@
+# 공휴일·휴무일 대장
+#
+# type 값
+#   공휴일     — 「공휴일에 관한 법률」·「관공서의 공휴일에 관한 규정」상 공휴일
+#   대체공휴일 — 위 공휴일이 토·일요일과 겹쳐 생긴 대체공휴일
+#   근로자의날 — 「근로자의 날 제정에 관한 법률」. 관공서는 근무하나 금융기관은 휴무이고,
+#                국세기본법 제5조(기한의 특례)에서 공휴일·토요일과 같이 취급된다
+#   선거일     — 임기만료에 의한 선거의 선거일
+#   임시공휴일 — 수시 지정
+#
+# confidence 값
+#   high   — 고정 공휴일이거나 대체공휴일 규칙으로 날짜가 결정되고 요일까지 교차확인된 것
+#   medium — 복수 민간 달력이 일치하나 1차 출처(관보·인사혁신처 고시)로 확인하지 못한 것
+#
+# 2단계에서 한국천문연구원 특일정보 API(apis.data.go.kr)로 교차검증해 confidence를 올린다.
+# 매년 11월에 다음 해 공휴일을 갱신한다.
+
+meta:
+  updated_on: 2026-10-10
+  verified_against_primary_source: false
+  sources:
+    - https://publicholidays.co.kr/ko/
+    - https://utils.spemer.com/public-holidays/
+    - https://www.wikitree.co.kr/articles/1134027   # 제헌절 2026년 공휴일 재지정
+    - https://nts.go.kr/nts/ad/taxSchdul/selectList.do?mi=135747   # 국세기본법 제5조 안내
+  notes:
+    - 현충일은 대체공휴일 적용 대상이 아니다.
+    - 설날·추석 연휴는 일요일과 겹칠 때만 대체공휴일이 생긴다.
+    - 근로자의 날(5/1)의 관공서 공휴일 지정 여부는 보도가 엇갈려 공휴일로 등록하지 않았다.
+      금융기관 휴무이자 국세기본법 제5조 대상이므로 type을 근로자의날로 두어 세법 기한
+      계산에는 반영되고, 관공서 기준(govt) 계산에는 반영되지 않는다.
+
+holidays:
+  # ---------------- 2026 ----------------
+  - { date: 2026-01-01, name: 신정,              type: 공휴일,     confidence: high }
+  - { date: 2026-02-16, name: 설날 연휴,         type: 공휴일,     confidence: high }
+  - { date: 2026-02-17, name: 설날,              type: 공휴일,     confidence: high }
+  - { date: 2026-02-18, name: 설날 연휴,         type: 공휴일,     confidence: high }
+  - { date: 2026-03-01, name: 삼일절,            type: 공휴일,     confidence: high }
+  - { date: 2026-03-02, name: 삼일절 대체공휴일,  type: 대체공휴일, confidence: high }
+  - { date: 2026-05-01, name: 근로자의 날,       type: 근로자의날, confidence: high }
+  - { date: 2026-05-05, name: 어린이날,          type: 공휴일,     confidence: high }
+  - { date: 2026-05-24, name: 부처님오신날,      type: 공휴일,     confidence: medium }
+  - { date: 2026-05-25, name: 부처님오신날 대체공휴일, type: 대체공휴일, confidence: medium }
+  - { date: 2026-06-03, name: 제9회 전국동시지방선거, type: 선거일,  confidence: medium }
+  - { date: 2026-06-06, name: 현충일,            type: 공휴일,     confidence: high }
+  - { date: 2026-07-17, name: 제헌절,            type: 공휴일,     confidence: medium,
+      note: 2026년부터 공휴일 재지정. 공포 3개월 후 시행 }
+  - { date: 2026-08-15, name: 광복절,            type: 공휴일,     confidence: high }
+  - { date: 2026-08-17, name: 광복절 대체공휴일,  type: 대체공휴일, confidence: high }
+  - { date: 2026-09-24, name: 추석 연휴,         type: 공휴일,     confidence: medium }
+  - { date: 2026-09-25, name: 추석,              type: 공휴일,     confidence: medium }
+  - { date: 2026-09-26, name: 추석 연휴,         type: 공휴일,     confidence: medium }
+  - { date: 2026-10-03, name: 개천절,            type: 공휴일,     confidence: high }
+  - { date: 2026-10-05, name: 개천절 대체공휴일,  type: 대체공휴일, confidence: high }
+  - { date: 2026-10-09, name: 한글날,            type: 공휴일,     confidence: high }
+  - { date: 2026-12-25, name: 성탄절,            type: 공휴일,     confidence: high }
+
+  # ---------------- 2027 ----------------
+  - { date: 2027-01-01, name: 신정,              type: 공휴일,     confidence: high }
+  - { date: 2027-02-06, name: 설날 연휴,         type: 공휴일,     confidence: medium }
+  - { date: 2027-02-07, name: 설날,              type: 공휴일,     confidence: medium }
+  - { date: 2027-02-08, name: 설날 연휴,         type: 공휴일,     confidence: medium }
+  - { date: 2027-02-09, name: 설날 대체공휴일,    type: 대체공휴일, confidence: medium }
+  - { date: 2027-03-01, name: 삼일절,            type: 공휴일,     confidence: high }
+  - { date: 2027-05-01, name: 근로자의 날,       type: 근로자의날, confidence: high }
+  - { date: 2027-05-02, name: 부처님오신날,      type: 공휴일,     confidence: medium }
+  - { date: 2027-05-03, name: 부처님오신날 대체공휴일, type: 대체공휴일, confidence: medium }
+  - { date: 2027-05-05, name: 어린이날,          type: 공휴일,     confidence: high }
+  - { date: 2027-06-06, name: 현충일,            type: 공휴일,     confidence: high }
+  - { date: 2027-07-17, name: 제헌절,            type: 공휴일,     confidence: medium }
+  - { date: 2027-07-19, name: 제헌절 대체공휴일,  type: 대체공휴일, confidence: medium }
+  - { date: 2027-08-15, name: 광복절,            type: 공휴일,     confidence: high }
+  - { date: 2027-08-16, name: 광복절 대체공휴일,  type: 대체공휴일, confidence: high }
+  - { date: 2027-09-14, name: 추석 연휴,         type: 공휴일,     confidence: medium }
+  - { date: 2027-09-15, name: 추석,              type: 공휴일,     confidence: medium }
+  - { date: 2027-09-16, name: 추석 연휴,         type: 공휴일,     confidence: medium }
+  - { date: 2027-10-03, name: 개천절,            type: 공휴일,     confidence: high }
+  - { date: 2027-10-04, name: 개천절 대체공휴일,  type: 대체공휴일, confidence: high }
+  - { date: 2027-10-09, name: 한글날,            type: 공휴일,     confidence: high }
+  - { date: 2027-10-11, name: 한글날 대체공휴일,  type: 대체공휴일, confidence: high }
+  - { date: 2027-12-25, name: 성탄절,            type: 공휴일,     confidence: high }
+  - { date: 2027-12-27, name: 성탄절 대체공휴일,  type: 대체공휴일, confidence: high }

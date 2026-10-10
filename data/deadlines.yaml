@@ -1,0 +1,254 @@
+# 마감 기한 대장
+#
+# recurrence — 기한 생성 규칙 (한 가지 형태로 통일한다)
+#   months: 적용 월 목록. 생략하거나 null이면 매월.
+#   day:    해당 월의 일자. 정수 또는 last(말일).
+#
+# holiday_rule — 기한일이 휴일일 때 보정
+#   next_business_day     다음 영업일 (세법 기한의 기본. 국세기본법 제5조)
+#   previous_business_day 직전 영업일
+#   none                  보정하지 않음
+#
+# scope — 어느 휴일 집합을 쉬는 날로 보는가 (scripts/holidays.py 참조)
+#   tax   공휴일·토요일·근로자의 날 (국세기본법 제5조)
+#   govt  관공서 공휴일만 (근로자의 날 제외)
+#
+# leads — 며칠 전에 알릴지. 0은 당일.
+#
+# effective_from / effective_until — 규칙 변경이 있는 항목의 적용 구간 (생략 시 상시)
+#
+# verified — 1차 출처(법령 원문·감독당국 서식)로 확인했는가.
+#   false인 항목은 알림 메일에 「미검증」 표시가 붙는다. 기억으로 쓴 날짜를 true로 올리지 않는다.
+
+meta:
+  updated_on: 2026-10-10
+  owner_note: |
+    감독 보고와 내부 결산 일정은 사용자만 알 수 있어 틀만 두었다. 실제 기한을 확인해
+    채우고 verified를 올린다. 금액·거래상대·내부 조직명은 적지 않는다.
+
+deadlines:
+  # ========================= 세무 =========================
+  - id: wht-monthly
+    name: 원천세 신고·납부
+    category: 세무
+    recurrence: { day: 10 }
+    holiday_rule: next_business_day
+    scope: tax
+    leads: [7, 3, 1, 0]
+    basis: 소득세법 제128조 — 징수일이 속한 달의 다음 달 10일까지 납부
+    source: https://www.nts.go.kr/nts/ad/taxSchdul/selectList.do?mi=135747
+    note: |
+      반기납부는 상시고용인원 20인 이하 소규모 사업자 대상이므로 보험사는 해당하지 않는다.
+      보험차익·연금소득 원천징수분이 함께 걸린다.
+    verified: false
+
+  - id: simple-stmt-business-other
+    name: 간이지급명세서 (사업소득·기타소득)
+    category: 세무
+    recurrence: { day: last }
+    holiday_rule: next_business_day
+    scope: tax
+    leads: [7, 3, 1, 0]
+    basis: 소득세법 제164조의3 — 지급일이 속한 달의 다음 달 말일까지 매월 제출
+    source: https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=40349&cntntsId=238925
+    verified: false
+
+  - id: simple-stmt-wage-semiannual
+    name: 간이지급명세서 (근로소득) — 반기 제출
+    category: 세무
+    recurrence: { months: [1, 7], day: last }
+    holiday_rule: next_business_day
+    scope: tax
+    leads: [14, 7, 3, 1, 0]
+    basis: 지급일이 속한 반기의 마지막 달 다음 달 말일 (1~6월분 7월 말, 7~12월분 익년 1월 말)
+    source: https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=40678&cntntsId=239032
+    effective_until: 2027-01-31
+    note: |
+      2027년 1월 지급분부터 매월 제출로 바뀐다 → simple-stmt-wage-monthly로 승계.
+      effective_until은 기한일 기준이다. 2026년 하반기 지급분의 반기 제출 기한이
+      2027-01-31이므로 그 날까지 유효하다.
+    verified: false
+
+  - id: simple-stmt-wage-monthly
+    name: 간이지급명세서 (근로소득) — 매월 제출
+    category: 세무
+    recurrence: { day: last }
+    holiday_rule: next_business_day
+    scope: tax
+    leads: [7, 3, 1, 0]
+    basis: 2027년 1월 지급분부터 매월 제출. 지급일이 속한 달의 다음 달 말일
+    source: https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=40678&cntntsId=239032
+    effective_from: 2027-02-01
+    note: 시행 시점을 1차 출처로 재확인한 뒤 verified를 올린다
+    verified: false
+
+  - id: pay-stmt-annual-wage-business
+    name: 지급명세서 (근로·사업소득) 연간 제출
+    category: 세무
+    recurrence: { months: [3], day: 10 }
+    holiday_rule: next_business_day
+    scope: tax
+    leads: [14, 7, 3, 1, 0]
+    basis: 지급 연도의 다음 연도 3월 10일
+    source: https://www.nts.go.kr/nts/ad/taxSchdul/selectList.do?mi=135747
+    verified: false
+
+  - id: pay-stmt-annual-financial
+    name: 지급명세서 (이자·배당 등 금융소득, 기타소득) 연간 제출
+    category: 세무
+    recurrence: { months: [2], day: last }
+    holiday_rule: next_business_day
+    scope: tax
+    leads: [14, 7, 3, 1, 0]
+    basis: 지급 연도의 다음 연도 2월 말일
+    source: https://www.nts.go.kr/nts/ad/taxSchdul/selectList.do?mi=135747
+    note: 기타소득 간이지급명세서를 매월 제출한 경우 연간 기타소득 지급명세서는 면제된다
+    verified: false
+
+  - id: corp-tax-annual
+    name: 법인세 신고·납부 (12월 결산)
+    category: 세무
+    recurrence: { months: [3], day: last }
+    holiday_rule: next_business_day
+    scope: tax
+    leads: [30, 14, 7, 3, 1, 0]
+    basis: 법인세법 제60조 — 사업연도 종료일이 속하는 달의 말일부터 3개월 이내
+    source: https://www.law.go.kr/
+    note: 2026 사업연도부터 법인세율 1%p 인상분이 반영된다
+    verified: false
+
+  - id: corp-tax-interim
+    name: 법인세 중간예납 (12월 결산)
+    category: 세무
+    recurrence: { months: [8], day: last }
+    holiday_rule: next_business_day
+    scope: tax
+    leads: [30, 14, 7, 3, 1, 0]
+    basis: 법인세법 제63조 — 중간예납기간(1.1~6.30) 종료일부터 2개월 이내
+    source: https://www.taxtimes.co.kr/mobile/article.html?no=276257
+    note: 세액 1천만원 초과 시 분납 가능(일반기업 1개월)
+    verified: false
+
+  - id: local-corp-tax
+    name: 법인지방소득세 신고·납부
+    category: 세무
+    recurrence: { months: [4], day: last }
+    holiday_rule: next_business_day
+    scope: tax
+    leads: [14, 7, 3, 1, 0]
+    basis: 지방세법 — 법인세 신고기한 종료일부터 1개월 이내 (확인 필요)
+    source: https://www.law.go.kr/
+    note: 기한 근거 조문을 원문으로 확인하지 못했다. 반드시 검증 후 verified를 올린다
+    verified: false
+
+  - id: vat-return
+    name: 부가가치세 신고·납부
+    category: 세무
+    recurrence: { months: [1, 4, 7, 10], day: 25 }
+    holiday_rule: next_business_day
+    scope: tax
+    leads: [7, 3, 1, 0]
+    basis: 확정신고 1/25·7/25, 예정신고 4/25·10/25
+    source: https://www.nts.go.kr/nts/ad/taxSchdul/selectList.do?mi=135747
+    note: 보험업은 대부분 면세사업이나 과세 겸영분이 있으면 해당한다. 해당 여부를 확인할 것
+    verified: false
+
+  - id: education-tax
+    name: 교육세 신고·납부 (금융·보험업자)
+    category: 세무
+    recurrence: { months: [1, 4, 7, 10], day: last }
+    holiday_rule: next_business_day
+    scope: tax
+    leads: [14, 7, 3, 1, 0]
+    basis: |
+      교육세법 제8조 — 금융·보험업자의 과세기간은 분기(1~3월, 4~6월, 7~9월, 10~12월).
+      제9조의 신고·납부기한은 원문 확인이 필요하다. 아래 recurrence는 과세기간 종료 다음 달
+      말일로 가정해 둔 임시값이다.
+    source: https://www.law.go.kr/
+    note: |
+      기한과 과세기간 대응을 교육세법 제9조 원문으로 반드시 확인할 것 — 현재 recurrence는
+      검증되지 않은 가정이다. 과세표준은 수익금액, 세율은 수익금액의 5/1,000이며,
+      연간 수익 1조원 초과 금융·보험사 대상 1.0% 인상 개정이 진행 중이다(우리 회사 해당
+      여부 확인 필요). 자금 관점에서는 분기마다 나가는 현금 유출이다.
+    verified: false
+
+  # ===================== 감독 보고 =====================
+  - id: fss-monthly-report
+    name: 업무보고서 (월) 제출
+    category: 감독보고
+    recurrence: { day: last }
+    holiday_rule: none
+    scope: govt
+    leads: [7, 3, 1, 0]
+    basis: 보험업법 제118조 제2항 — 매월의 업무 내용을 다음 달 말일까지 제출
+    source: https://www.law.go.kr/
+    note: |
+      항목별 작성주기·보고기한은 보험업감독업무시행세칙 별지 제26호·제26-2호에 따른다.
+      우리 팀이 실제로 담당하는 항목과 그 기한을 별지에서 확인해 세분화할 것.
+      holiday_rule을 none으로 둔 것은 보정 방향을 확인하지 못했기 때문이다.
+    verified: false
+
+  - id: fx-business-monthly
+    name: 외국환업무현황보고서 (월보)
+    category: 감독보고
+    recurrence: { day: 20 }
+    holiday_rule: none
+    scope: govt
+    leads: [7, 3, 1, 0]
+    basis: 보험업감독업무시행세칙 제3-9조 — 월보는 다음 달 20일 이내
+    source: https://www.fss.or.kr/
+    note: 환헤지·외화자산 관련 보고로 자금부 업무에 직결된다
+    verified: false
+
+  - id: fx-business-quarterly
+    name: 외국환업무현황보고서 (분기보)
+    category: 감독보고
+    recurrence: { months: [1, 4, 7, 10], day: 20 }
+    holiday_rule: none
+    scope: govt
+    leads: [7, 3, 1, 0]
+    basis: 보험업감독업무시행세칙 제3-9조 — 분기보는 분기가 속한 달의 다음 달 20일 이내
+    source: https://www.fss.or.kr/
+    verified: false
+
+  # ============ 결산·자금 (사용자 확인 필요) ============
+  # 아래는 틀이다. 실제 기한을 확인해 채우고 verified를 올린다.
+  # 사내 일정이므로 날짜만 적고 금액·조직명·거래상대는 넣지 않는다.
+  - id: kics-report
+    name: K-ICS 지급여력비율 보고
+    category: 감독보고
+    recurrence: { months: [2, 5, 8, 11], day: last }
+    holiday_rule: none
+    scope: govt
+    leads: [14, 7, 3, 1, 0]
+    basis: 분기 결산 기준 보고 — 실제 기한 확인 필요
+    source: null
+    note: 사용자 확인 대기. 확인 전까지 알림에 「미검증」으로 나간다
+    verified: false
+    enabled: false
+
+  - id: liquidity-report
+    name: 유동성비율 보고
+    category: 감독보고
+    recurrence: { day: last }
+    holiday_rule: none
+    scope: govt
+    leads: [7, 3, 1, 0]
+    basis: 실제 기한 확인 필요
+    source: null
+    note: 사용자 확인 대기
+    verified: false
+    enabled: false
+
+  - id: month-close
+    name: 월말 결산 마감
+    category: 결산
+    recurrence: { day: last }
+    holiday_rule: previous_business_day
+    scope: govt
+    leads: [5, 3, 1, 0]
+    basis: 내부 결산 일정 — 사용자 확인 필요
+    source: null
+    note: 사용자 확인 대기. 실제 마감일(영업일 기준 n일 등)로 바꿀 것
+    verified: false
+    enabled: false
