@@ -1,0 +1,13 @@
+{
+  "source": "금융위원회",
+  "title": "보험업감독규정 일부개정규정안 입법예고 (테스트 픽스처)",
+  "status": "의결",
+  "category": "자본규제",
+  "url": "https://www.fsc.go.kr/no010101/99999",
+  "confidence": "primary",
+  "announced_on": "2026-10-05",
+  "effective_on": "2027-01-01",
+  "transitional": "기존 발행분은 2028-12-31까지 종전 규정 적용",
+  "impact": "시행일이 확정되어 재발행 시점을 역산할 수 있다",
+  "todo": "2027-01-01 이전 발행분 한도 점검"
+}

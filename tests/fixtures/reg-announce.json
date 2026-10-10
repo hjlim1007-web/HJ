@@ -1,0 +1,14 @@
+{
+  "source": "금융위원회",
+  "title": "보험업감독규정 일부개정규정안 입법예고 (테스트 픽스처)",
+  "status": "입법예고",
+  "category": "자본규제",
+  "url": "https://www.fsc.go.kr/no010101/99999?curPage=5",
+  "confidence": "search-only",
+  "announced_on": "2026-10-05",
+  "comment_due": "2026-10-26",
+  "effective_on": null,
+  "transitional": null,
+  "impact": "경과조치 적용 여부에 따라 K-ICS 가용자본 인정한도가 달라진다",
+  "todo": "원문에서 시행일과 경과조치 확인"
+}

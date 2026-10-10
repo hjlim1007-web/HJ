@@ -209,3 +209,18 @@ def test_day_clamps_to_month_end(cal):
     ]
     got = ids_on(item, cal, D(2026, 2, 28))
     assert got["probe"].due_date == D(2026, 2, 28)
+
+
+def test_verified_items_must_carry_a_source(deadlines):
+    """기억으로 쓴 날짜가 검증된 것처럼 올라가는 경로를 막는다."""
+    bad = [
+        i["id"]
+        for i in deadlines
+        if i.get("verified") and not str(i.get("source") or "").strip()
+    ]
+    assert not bad, f"verified: true 인데 source가 없다: {bad}"
+
+
+def test_every_deadline_states_its_basis(deadlines):
+    missing = [i["id"] for i in deadlines if not str(i.get("basis") or "").strip()]
+    assert not missing, f"basis가 없는 항목: {missing}"

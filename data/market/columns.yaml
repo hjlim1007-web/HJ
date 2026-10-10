@@ -1,0 +1,124 @@
+# 시장지표 시계열의 열 정의
+#
+# sane_min / sane_max 는 **전망치가 아니라 입력 사고를 잡는 가드다.**
+# 가장 흔한 사고는 두 가지다.
+#   - 단위 실수: 원/달러를 1350이 아니라 13.5로 적는다
+#   - 척도 혼용: 금리에 퍼센트(3.25)와 bp(325)를 섞는다
+# 그래서 범위는 역사적 극단을 넉넉히 감싸도록 넓게 둔다. 좁히는 것이 목적이 아니다.
+#
+# reject_zero — 0을 거부할지. 열마다 다르다.
+#   금리·환율·지수·유가에서 0은 "확인 못 한 값을 0으로 메운" 흔적이므로 거부한다.
+#   스왑포인트는 0이 실제로 나올 수 있는 값이므로 거부하지 않는다.
+#
+# 값을 확인하지 못했으면 **빈 칸으로 둔다.** 0이나 추정치로 메우지 않는다 (CLAUDE.md).
+#
+# display_note — 메일·보고서에 **독자에게 보이는** 한 줄. 지표 자체의 설명만 쓴다.
+# guard_note   — 이 파일을 고치는 사람을 위한 **내부 메모.** 산출물에 나가지 않는다.
+#
+# 알려진 한계: 2020-04 WTI 선물의 마이너스 체결 같은 사건은 sane_min에 걸려 거부된다.
+# 그런 값을 실제로 적어야 하면 이 파일의 범위를 먼저 고친다.
+
+meta:
+  updated_on: 2026-10-10
+  note: 범위는 오타 검출용 가드다. 시장 전망과 무관하다.
+
+columns:
+  - name: cgb_3y
+    label: 국고채 3년
+    unit: "%"
+    decimals: 3
+    sane_min: 0.1
+    sane_max: 15.0
+    reject_zero: true
+
+  - name: cgb_10y
+    label: 국고채 10년
+    unit: "%"
+    decimals: 3
+    sane_min: 0.1
+    sane_max: 15.0
+    reject_zero: true
+
+  - name: cd_91
+    label: CD 91일
+    unit: "%"
+    decimals: 2
+    sane_min: 0.1
+    sane_max: 15.0
+    reject_zero: true
+
+  - name: ust_10y
+    label: 미 국채 10년
+    unit: "%"
+    decimals: 3
+    sane_min: 0.1
+    sane_max: 20.0
+    reject_zero: true
+
+  - name: usdkrw
+    label: 원/달러
+    unit: 원
+    decimals: 2
+    sane_min: 500.0
+    sane_max: 3000.0
+    reject_zero: true
+    display_note: 서울외환시장 종가(주간거래 기준)
+
+  - name: eurkrw
+    label: 원/유로
+    unit: 원
+    decimals: 2
+    sane_min: 500.0
+    sane_max: 3500.0
+    reject_zero: true
+
+  - name: jpykrw_100
+    label: 원/엔
+    unit: 원/100엔
+    decimals: 2
+    sane_min: 400.0
+    sane_max: 2000.0
+    reject_zero: true
+    display_note: 100엔당
+    guard_note: 엔당으로 적는 실수를 sane_min이 잡는다
+
+  - name: dxy
+    label: 달러인덱스
+    unit: pt
+    decimals: 2
+    sane_min: 50.0
+    sane_max: 180.0
+    reject_zero: true
+
+  - name: brent
+    label: Brent
+    unit: USD/bbl
+    decimals: 2
+    sane_min: 1.0
+    sane_max: 300.0
+    reject_zero: true
+
+  - name: wti
+    label: WTI
+    unit: USD/bbl
+    decimals: 2
+    sane_min: 1.0
+    sane_max: 300.0
+    reject_zero: true
+
+  - name: kospi
+    label: KOSPI
+    unit: pt
+    decimals: 2
+    sane_min: 100.0
+    sane_max: 10000.0
+    reject_zero: true
+
+  - name: swap_point_1y
+    label: 스왑포인트 1년
+    unit: 원
+    decimals: 2
+    sane_min: -100.0
+    sane_max: 100.0
+    reject_zero: false
+    guard_note: 0이 실제로 가능한 값이므로 0을 거부하지 않는다

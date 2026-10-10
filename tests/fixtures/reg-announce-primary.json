@@ -1,0 +1,14 @@
+{
+  "source": "금융위원회",
+  "title": "보험업감독규정 일부개정규정안 입법예고 (테스트 픽스처)",
+  "status": "입법예고",
+  "category": "자본규제",
+  "url": "https://www.fsc.go.kr/no010101/99999?curPage=5",
+  "confidence": "primary",
+  "announced_on": "2026-10-05",
+  "comment_due": "2026-10-26",
+  "effective_on": "2027-01-01",
+  "transitional": "기존 발행분은 2028-12-31까지 종전 규정 적용",
+  "impact": "경과조치 종료 시점에 자본성증권 재발행 수요가 몰린다",
+  "todo": "콜 도래 스케줄과 겹치는지 확인"
+}

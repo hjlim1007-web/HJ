@@ -4,7 +4,7 @@
     python3 scripts/render_alert.py --date 2026-11-10 -o out.html
 
 조판을 매일 다시 만들지 않고 스크립트로 고정한다. 알림의 가치는 정확성이므로 날마다
-결과가 흔들리지 않는 것이 중요하다. 사양은 routines/email-style.md를 따른다.
+결과가 흔들리지 않는 것이 중요하다. 색·서체·페이지 틀은 mailstyle.py에 있다.
 
 표준 출력은 HTML, 표준 오류에 제목 한 줄(`SUBJECT: ...`)을 낸다. 보낼 항목이 없으면
 HTML을 내지 않고 종료 코드 3으로 끝낸다 — 그 날은 메일을 보내지 않는다는 신호다.
@@ -14,40 +14,30 @@ from __future__ import annotations
 
 import argparse
 import datetime
-import html
 import json
 import subprocess
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
-WD = "월화수목금토일"
-
-# routines/email-style.md
-C_TITLE = "#212529"
-C_BODY = "#3a3f44"
-C_MUTED = "#8a8f94"
-C_HAIR = "#e3e3e3"
-C_RULE = "#c9c9c9"
-C_ACCENT = "#01c1d6"
-C_STRONG = "#150f96"
-C_BAND = "#f7f7f7"
-FONT = (
-    "-apple-system, BlinkMacSystemFont, 'Malgun Gothic', "
-    "'Apple SD Gothic Neo', '맑은 고딕', sans-serif"
+from mailstyle import (
+    C_ACCENT,
+    C_BAND,
+    C_BODY,
+    C_HAIR,
+    C_MUTED,
+    C_STRONG,
+    C_TITLE,
+    SIZE_BODY,
+    SIZE_SECTION,
+    SIZE_SMALL,
+    esc,
+    fmt_date,
+    link,
+    page,
+    section_head,
 )
 
-
-def fmt_date(iso: str) -> str:
-    d = datetime.date.fromisoformat(iso)
-    return f"{d.isoformat()}({WD[d.weekday()]})"
-
-
-def esc(text: str | None) -> str:
-    if not text:
-        return ""
-    # yaml 블록 스칼라의 줄바꿈은 한 칸으로 눌러 읽기 흐름을 유지한다.
-    return html.escape(" ".join(text.split()))
+ROOT = Path(__file__).resolve().parent
 
 
 def subject(payload: dict) -> str:
@@ -60,51 +50,51 @@ def subject(payload: dict) -> str:
 
 
 def render_item(a: dict) -> str:
-    accent = C_STRONG if a["days_until"] == 0 else None
-    pad_left = "13px" if accent else "0"
-    border = f"border-left:3px solid {accent};" if accent else ""
+    # D-0 항목만 왼쪽에 진한 파랑 세로선을 둔다 — 지면에서 가장 급한 것 하나만 세운다.
+    urgent = a["days_until"] == 0
+    border = f"border-left:3px solid {C_STRONG};padding-left:13px;" if urgent else ""
 
-    head = f"D-{a['days_until']} · {fmt_date(a['due_date'])}"
     tag = (
-        f'<span style="font-size:13px;color:{C_ACCENT};"> 미검증</span>'
+        f'<span style="font-size:{SIZE_SMALL}px;color:{C_ACCENT};"> 미검증</span>'
         if not a["verified"]
         else ""
     )
     shift = (
-        f'<span style="font-size:13px;color:{C_MUTED};">'
+        f'<span style="font-size:{SIZE_SMALL}px;color:{C_MUTED};">'
         f"（원래 {fmt_date(a['raw_due_date'])}, 휴일 보정）</span>"
         if a["shifted"]
         else ""
     )
 
     rows = [
-        f'<div style="font-size:19px;font-weight:600;color:{C_TITLE};'
+        f'<div style="font-size:{SIZE_SECTION}px;font-weight:600;color:{C_TITLE};'
         f'line-height:1.5;">{esc(a["name"])}{tag}</div>',
-        f'<div style="font-size:16px;color:{C_ACCENT};padding-top:4px;">'
-        f"{head}{shift}</div>",
+        f'<div style="font-size:{SIZE_BODY}px;color:{C_ACCENT};padding-top:4px;">'
+        f"D-{a['days_until']} · {fmt_date(a['due_date'])}{shift}</div>",
     ]
     if a.get("basis"):
         rows.append(
-            f'<div style="font-size:16px;color:{C_BODY};line-height:1.7;'
+            f'<div style="font-size:{SIZE_BODY}px;color:{C_BODY};line-height:1.7;'
             f'padding-top:10px;">{esc(a["basis"])}</div>'
         )
     if a.get("note"):
         rows.append(
             f'<div style="background:{C_BAND};padding:12px 14px;margin-top:12px;">'
-            f'<div style="font-size:13px;color:{C_ACCENT};padding-bottom:4px;">참고</div>'
-            f'<div style="font-size:16px;color:{C_BODY};line-height:1.7;">'
+            f'<div style="font-size:{SIZE_SMALL}px;color:{C_ACCENT};'
+            f'padding-bottom:4px;">참고</div>'
+            f'<div style="font-size:{SIZE_BODY}px;color:{C_BODY};line-height:1.7;">'
             f'{esc(a["note"])}</div></div>'
         )
     if a.get("source"):
-        url = html.escape(a["source"], quote=True)
         rows.append(
             f'<div style="font-size:14px;line-height:2;padding-top:8px;">'
-            f'<a href="{url}" style="color:{C_ACCENT};text-decoration:none;">출처</a></div>'
+            f'{link(a["source"], "출처")}</div>'
         )
 
     return (
-        f'<tr><td style="padding:22px 0;border-bottom:1px solid {C_HAIR};'
-        f'{border}padding-left:{pad_left};">' + "".join(rows) + "</td></tr>"
+        f'<tr><td style="padding:22px 0;border-bottom:1px solid {C_HAIR};{border}">'
+        + "".join(rows)
+        + "</td></tr>"
     )
 
 
@@ -116,59 +106,31 @@ def render(payload: dict) -> str:
     groups: dict[str, list[dict]] = {}
     for a in alerts:
         groups.setdefault(a["category"], []).append(a)
-    show_headings = len(groups) > 1
 
     body: list[str] = []
     for i, (category, items) in enumerate(groups.items()):
-        if show_headings:
-            top = "28px" if i else "4px"
-            body.append(
-                f'<tr><td style="padding:{top} 0 0;border-top:1px solid {C_RULE};">'
-                f'<div style="font-size:19px;font-weight:600;color:{C_TITLE};'
-                f'padding-top:18px;">{esc(category)}</div></td></tr>'
-            )
+        # 분류가 1종이면 소제목을 넣지 않는다 — 전부 같은 분류인데 머리를 다는 건 군더더기다.
+        if len(groups) > 1:
+            body.append(section_head(None, category, first=(i == 0)))
         body.extend(render_item(a) for a in items)
 
-    notes = [
-        f"기준일 {fmt_date(ref.isoformat())} · 산출 scripts/due.py",
+    footnotes = [
+        f"기준일 {fmt_date(ref)} · 산출 scripts/due.py",
         "기한일이 휴일이면 보정한 날짜로 D-n을 센다.",
     ]
     if any(not a["verified"] for a in alerts):
-        notes.append(
+        footnotes.append(
             "미검증 항목은 1차 출처로 확인되지 않은 기한이다 — 실제 기한을 확인하고 쓸 것."
         )
     if cal["years"] and max(cal["years"]) <= ref.year:
-        notes.append(
-            "공휴일 대장에 다음 해가 없다 — data/holidays.yaml 갱신 필요."
-        )
-    footnote = "<br>".join(esc(n) for n in notes)
+        footnotes.append("공휴일 대장에 다음 해가 없다 — data/holidays.yaml 갱신 필요.")
 
-    return f"""<!doctype html>
-<html lang="ko"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>마감 알림</title></head>
-<body style="margin:0;padding:0;background:#ffffff;">
-<table width="100%" cellpadding="0" cellspacing="0" border="0"
-  style="background:#ffffff;"><tr><td align="center">
-<table width="100%" cellpadding="0" cellspacing="0" border="0"
-  style="max-width:680px;font-family:{FONT};word-break:keep-all;">
-  <tr><td style="background:{C_TITLE};height:6px;line-height:6px;font-size:0;">&nbsp;</td></tr>
-  <tr><td style="padding:30px 24px 0;">
-    <div style="font-size:28px;font-weight:600;color:{C_TITLE};">마감 알림</div>
-    <div style="font-size:14px;color:{C_MUTED};line-height:1.7;padding-top:10px;">
-      {fmt_date(ref.isoformat())}<br>항목 {len(alerts)}건
-    </div>
-  </td></tr>
-  <tr><td style="padding:24px 24px 0;">
-    <table width="100%" cellpadding="0" cellspacing="0" border="0">{''.join(body)}</table>
-  </td></tr>
-  <tr><td style="padding:20px 24px 36px;">
-    <div style="border-top:1px solid {C_RULE};padding-top:14px;
-      font-size:14px;color:{C_MUTED};line-height:1.7;">{footnote}</div>
-  </td></tr>
-</table></td></tr></table>
-</body></html>
-"""
+    return page(
+        title="마감 알림",
+        header_lines=[fmt_date(ref), f"항목 {len(alerts)}건"],
+        body="".join(body),
+        footnotes=footnotes,
+    )
 
 
 def main() -> int:
