@@ -3,5 +3,5 @@
   "emailEnabled": true,
   "emailMode": "combined",
   "recipients": ["hjlim1007@naver.com"],
-  "departments": { "finance": true, "risk": true, "general": true }
+  "departments": { "finance": true, "treasury": true, "risk": true, "general": true }
 }
