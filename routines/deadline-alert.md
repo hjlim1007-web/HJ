@@ -52,12 +52,24 @@ cd /home/user/HJ && python3 scripts/due.py
 
 ## 3. 메일 구성
 
-제목: `[마감] YYYY-MM-DD(요일) D-n 항목 N건` — 가장 급한 항목의 D-n을 쓴다. 당일 건이 있으면
-`D-0 포함`을 뒤에 붙인다.
+조판은 **스크립트가 한다.** 매일 LLM이 HTML을 새로 만들면 날마다 결과가 흔들리므로,
+`scripts/render_alert.py`가 `due.py` 출력을 받아 고정된 조판으로 HTML을 낸다.
 
-조판은 `routines/email-style.md`를 따른다. 표가 본체이므로 2열 규칙을 지킨다.
+```bash
+cd /home/user/HJ && python3 scripts/due.py > /tmp/due.json
+python3 scripts/render_alert.py < /tmp/due.json -o /tmp/alert.html
+```
 
-항목마다 다음을 쓴다. **전부 JSON에서 온 값이다.**
+- 표준 오류로 `SUBJECT: [마감] YYYY-MM-DD(요일) D-n 항목 N건` 한 줄이 나온다. **그 제목을 그대로
+  메일 제목으로 쓴다.** 가장 급한 항목의 D-n이 들어가므로 당일 건이 있으면 D-0으로 나타난다.
+- 걸린 항목이 없으면 HTML을 내지 않고 **종료 코드 3**으로 끝낸다 — 그 날은 메일을 보내지 않는다.
+- `/tmp/alert.html` 전문을 그대로 메일 본문(HTML)으로 보낸다. **손으로 고치지 않는다.**
+- 스크립트가 0도 3도 아닌 코드로 끝나면 오류 내용만 보고하고 종료한다.
+
+조판 사양은 `routines/email-style.md`이며 `render_alert.py`가 그것을 구현한 것이다. 사양을
+바꾸려면 스크립트를 고치고 테스트를 돌린다. 메일을 만들 때마다 다르게 조판하지 않는다.
+
+스크립트가 쓰는 값은 전부 `due.py` JSON에서 온다. 참고로 각 항목이 어떻게 들어가는지:
 
 - `name` — 제목 (19px, 600)
 - `due_date`와 `days_until` → `D-3 · 2026-11-10(화)` 형태. `shifted`가 true면
