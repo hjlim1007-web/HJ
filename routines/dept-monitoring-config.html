@@ -1,0 +1,287 @@
+<title>부서별 모니터링 설정</title>
+<style>
+/* Settings console for the departmental daily brief. Same language as the email it configures: white ground, one teal accent, gothic throughout, hairline rules instead of card borders. Two columns on desktop, one on a phone. */
+:root{
+  --bg:#f2f3f5;
+  --paper:#ffffff;
+  --ink:#212529;
+  --body:#3a3f44;
+  --muted:#8a8f94;
+  --hair:#e3e3e3;
+  --rule:#c9c9c9;
+  --accent:#01c1d6;
+  --accent-ink:#06707c;
+  --deep:#150f96;
+  --off:#cdd1d4;
+  --sans:-apple-system,BlinkMacSystemFont,"Malgun Gothic","Apple SD Gothic Neo","맑은 고딕",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15171a; --paper:#1d2024; --ink:#f0f2f4; --body:#c4c9ce; --muted:#8c949b;
+    --hair:#2c3036; --rule:#3a4047; --accent:#2ad4e6; --accent-ink:#2ad4e6; --deep:#8c93ff; --off:#4a5058;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15171a; --paper:#1d2024; --ink:#f0f2f4; --body:#c4c9ce; --muted:#8c949b;
+  --hair:#2c3036; --rule:#3a4047; --accent:#2ad4e6; --accent-ink:#2ad4e6; --deep:#8c93ff; --off:#4a5058;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--body);font-family:var(--sans);-webkit-font-smoothing:antialiased;font-size:16px;line-height:1.7;word-break:keep-all}
+.wrap{max-width:860px;margin:0 auto;padding-block:0 56px;padding-left:16px;padding-right:16px}
+
+.band{height:6px;background:var(--ink);margin:0 -16px}
+header{padding:30px 0 0}
+h1{font-size:clamp(24px,5.5vw,30px);font-weight:600;color:var(--ink);letter-spacing:-0.5px;line-height:1.25;margin:0;text-wrap:balance}
+.sub{font-size:14px;color:var(--muted);margin:10px 0 0;line-height:1.6}
+
+.panel{background:var(--paper);border:1px solid var(--hair);margin-top:24px}
+.panel-hd{padding:18px 20px 0}
+.panel-hd h2{font-size:19px;font-weight:600;color:var(--ink);margin:0;line-height:1.4}
+.panel-hd p{font-size:14px;color:var(--muted);margin:6px 0 0;line-height:1.6}
+.panel-bd{padding:16px 20px 20px}
+
+.row{display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-top:1px solid var(--hair)}
+.row:first-child{border-top:none}
+.row-txt{flex:1;min-width:0}
+.row-txt .t{font-size:16px;color:var(--ink);line-height:1.5}
+.row-txt .d{font-size:14px;color:var(--muted);line-height:1.6;margin-top:2px}
+
+button.sw{flex:none;width:52px;height:30px;border-radius:15px;border:none;background:var(--off);position:relative;cursor:pointer;padding:0;transition:background .15s;margin-top:2px}
+button.sw[aria-checked="true"]{background:var(--accent)}
+button.sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:12px;background:#fff;transition:transform .15s;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+button.sw[aria-checked="true"]::after{transform:translateX(22px)}
+button.sw:disabled{opacity:.45;cursor:not-allowed}
+button.sw:focus-visible{outline:2px solid var(--deep);outline-offset:2px}
+
+.seg{display:flex;gap:0;border:1px solid var(--rule);width:fit-content;max-width:100%;flex-wrap:wrap}
+.seg button{font-family:var(--sans);font-size:14px;padding:9px 16px;border:none;background:transparent;color:var(--body);cursor:pointer;line-height:1.4}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#06303a;font-weight:600}
+.seg button:focus-visible{outline:2px solid var(--deep);outline-offset:-2px}
+
+input[type=text]{font-family:var(--sans);font-size:16px;width:100%;padding:10px 12px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);border-radius:0}
+input[type=text]:focus-visible{outline:2px solid var(--accent);outline-offset:-1px}
+label.fld{display:block;font-size:14px;color:var(--muted);margin:16px 0 6px}
+
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 28px}
+@media (max-width:620px){.grid{grid-template-columns:1fr;gap:0}}
+
+.status{position:sticky;bottom:0;margin:0 -16px;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));background:var(--paper);border-top:1px solid var(--rule);font-size:14px;color:var(--muted);display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.status b{color:var(--ink);font-weight:600}
+.dot{display:inline-block;width:8px;height:8px;border-radius:4px;background:var(--accent);margin-right:7px;vertical-align:1px}
+.dot.warn{background:var(--deep)}
+
+.notice{background:var(--paper);border:1px solid var(--rule);border-left:3px solid var(--deep);padding:14px 16px;font-size:15px;color:var(--body);margin-top:24px;line-height:1.65}
+.notice b{color:var(--ink);font-weight:600}
+.foot{font-size:13.5px;color:var(--muted);line-height:1.7;margin-top:24px;padding-top:14px;border-top:1px solid var(--rule)}
+.count{font-size:14px;color:var(--accent-ink)}
+</style>
+
+<div class="wrap">
+  <div class="band"></div>
+  <header>
+    <h1>부서별 데일리 모니터링</h1>
+    <p class="sub">매일 아침 8시 25분(KST)에 실행됩니다. 앞부분 세 섹션 — 시장 지표와 오늘 일정, 거시와 정책, 보험 업계·감독·상품 — 은 항상 들어가고, 그 아래에 여기서 켠 부서의 섹션이 붙습니다. 뉴스 해석은 부서마다 다르게 씁니다.</p>
+    <p class="sub">기존 아침 통합 브리핑(8시)과는 별개로 발송됩니다.</p>
+  </header>
+
+  <div class="panel">
+    <div class="panel-hd">
+      <h2>발송</h2>
+      <p>끄면 메일을 보내지 않습니다. 브리핑 자체는 계속 생성되므로 나중에 다시 켜면 그날 것부터 받습니다. 켜 두었는데도 메일이 오지 않으면, claude.ai 설정의 Routines에서 <b>부서별 데일리 모니터링</b> 루틴에 Gmail 커넥터가 연결돼 있는지 확인해 주세요 — 커넥터가 없으면 브리핑은 만들어져도 발송만 건너뜁니다.</p>
+    </div>
+    <div class="panel-bd">
+      <div class="row">
+        <div class="row-txt">
+          <div class="t">이메일 발송</div>
+          <div class="d">켜짐일 때만 메일이 나갑니다.</div>
+        </div>
+        <button class="sw" id="sw-email" role="switch" aria-checked="false" aria-label="이메일 발송"></button>
+      </div>
+      <div class="row">
+        <div class="row-txt">
+          <div class="t">발송 방식</div>
+          <div class="d" id="mode-desc">선택한 부서를 한 통에 모아 보냅니다.</div>
+          <div class="seg" id="seg-mode" style="margin-top:10px">
+            <button type="button" data-mode="combined" aria-pressed="false">통합 1통</button>
+            <button type="button" data-mode="perDepartment" aria-pressed="false">부서별 개별</button>
+          </div>
+          <label class="fld" for="recipients">수신 주소 — 쉼표로 구분</label>
+          <input type="text" id="recipients" inputmode="email" autocomplete="off" placeholder="name@example.com">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-hd">
+      <h2>부서 <span class="count" id="count"></span></h2>
+      <p>켠 부서마다 섹션이 하나씩 붙습니다. 부서를 많이 켤수록 메일이 길어지니, 섹션당 기사 수는 자동으로 줄어듭니다 — 3개 이하면 부서당 3건, 그보다 많으면 2건.</p>
+    </div>
+    <div class="panel-bd">
+      <div class="grid" id="depts"></div>
+    </div>
+  </div>
+
+  <div class="notice" id="notice" hidden></div>
+
+  <p class="foot">설정은 저장하는 즉시 반영되며, 다음 실행부터 적용됩니다. 실행 시각이나 섹션 구성을 바꾸려면 대화로 말씀해 주세요 — 이 페이지에서는 부서, 발송 여부, 발송 방식, 수신 주소만 바꿀 수 있습니다.</p>
+
+  <div class="status">
+    <span id="status"><span class="dot warn"></span>불러오는 중</span>
+    <span id="when"></span>
+  </div>
+</div>
+
+<script>
+const DEPTS = [
+  {id:"finance",   name:"재무회계",        d:"결산·공시 일정, IFRS17 손익과 CSM, 법인세·이연법인세, 내부회계관리제도"},
+  {id:"actuarial", name:"계리",            d:"계리가정과 경험통계, 보험부채 평가, 할인율·LTFR, 계리감리, 요구자본 산출"},
+  {id:"product",   name:"상품",            d:"상품 신고·인가, 표준약관 개정, 공시이율·예정이율, 배타적사용권, 경쟁사 신상품"},
+  {id:"it",        name:"IT",              d:"전자금융감독규정, 망분리·클라우드·AI 가이드, 전산사고 제재, 차세대 시스템"},
+  {id:"risk",      name:"Risk Management", d:"K-ICS 요구자본, 금리·신용·환위험, 유동성리스크, 스트레스테스트, ORSA"},
+  {id:"comp",      name:"수당",            d:"1200%룰, 판매수수료 개편, 수수료 환수와 정착지원금, GA 시책"},
+  {id:"hr",        name:"인사",            d:"금융권 임단협, 노동법 개정, 보수체계 규제, 설계사 고용보험·산재"},
+  {id:"compliance",name:"준법감시",        d:"책무구조도, 금융회사 지배구조법, 자금세탁방지, 제재 사례, 개인정보보호"},
+  {id:"policy",    name:"계약관리",        d:"유지율, 부당승환, 부활·계약전환, 보험계약대출, 실효·해지 처리"},
+  {id:"claim",     name:"Claim",           d:"보험금 분쟁과 판례, 실손 누수, 보험사기, 지급심사 기준, 분쟁조정례"},
+  {id:"uw",        name:"UW",              d:"인수기준, 고지의무 분쟁, 유병자·고령자 인수, 재보험 인수조건"},
+  {id:"general",   name:"일반계정운용",    d:"채권·크레딧, 자산운용비율 규제, ALM과 듀레이션, 대체투자·부동산PF"},
+  {id:"separate",  name:"특별계정운용",    d:"변액 수익률·공시, 퇴직연금 감독규정, 디폴트옵션, 펀드 라인업"},
+  {id:"consumer",  name:"소비자보호",      d:"금융소비자보호법, 민원 통계, 미스터리쇼핑, 불완전판매, 실태평가"}
+];
+
+const $ = (s) => document.querySelector(s);
+const state = { emailEnabled:false, emailMode:"combined", recipients:[], departments:{}, loaded:false, writable:false };
+let doc = null, saveTimer = null;
+
+function renderDepts(){
+  const host = $("#depts");
+  if (!host.children.length){
+    DEPTS.forEach(dp => {
+      const row = document.createElement("div");
+      row.className = "row";
+      row.innerHTML =
+        '<div class="row-txt"><div class="t"></div><div class="d"></div></div>' +
+        '<button class="sw" role="switch" aria-checked="false"></button>';
+      row.querySelector(".t").textContent = dp.name;
+      row.querySelector(".d").textContent = dp.d;
+      const sw = row.querySelector("button");
+      sw.setAttribute("aria-label", dp.name);
+      sw.id = "sw-" + dp.id;
+      sw.addEventListener("click", () => {
+        state.departments[dp.id] = !state.departments[dp.id];
+        paint(); queueSave();
+      });
+      host.appendChild(row);
+    });
+  }
+}
+
+function paint(){
+  const on = DEPTS.filter(d => state.departments[d.id]).length;
+  $("#count").textContent = state.loaded ? on + " / " + DEPTS.length + " 켜짐" : "";
+  DEPTS.forEach(d => {
+    const sw = $("#sw-" + d.id);
+    sw.setAttribute("aria-checked", state.departments[d.id] ? "true" : "false");
+    sw.disabled = !state.writable;
+  });
+  const e = $("#sw-email");
+  e.setAttribute("aria-checked", state.emailEnabled ? "true" : "false");
+  e.disabled = !state.writable;
+  document.querySelectorAll("#seg-mode button").forEach(b => {
+    b.setAttribute("aria-pressed", b.dataset.mode === state.emailMode ? "true" : "false");
+    b.disabled = !state.writable;
+  });
+  $("#mode-desc").textContent = state.emailMode === "combined"
+    ? "선택한 부서를 한 통에 모아 보냅니다."
+    : "부서마다 따로 한 통씩 보냅니다. 앞의 세 섹션은 모든 메일에 같이 들어갑니다.";
+  const inp = $("#recipients");
+  if (document.activeElement !== inp) inp.value = state.recipients.join(", ");
+  inp.disabled = !state.writable;
+}
+
+function setStatus(text, warn){
+  $("#status").innerHTML = '<span class="dot' + (warn ? " warn" : "") + '"></span>' + text;
+}
+
+function queueSave(){
+  if (!doc || !state.writable) return;
+  setStatus("저장 중");
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    try{
+      await doc.set({
+        emailEnabled: state.emailEnabled,
+        emailMode: state.emailMode,
+        recipients: state.recipients,
+        departments: state.departments,
+        updatedAt: new Date().toISOString()
+      });
+      setStatus("저장됨");
+      $("#when").textContent = "마지막 저장 " + new Date().toLocaleString("ko-KR");
+    }catch(err){
+      setStatus("저장하지 못했습니다 — " + (err && err.code ? err.code : "알 수 없는 오류"), true);
+    }
+  }, 500);
+}
+
+function showNotice(html){
+  const n = $("#notice");
+  n.innerHTML = html;
+  n.hidden = false;
+}
+
+renderDepts();
+paint();
+
+(async () => {
+  const db = await (window.claude?.use?.("db") ?? Promise.resolve(null));
+  if (!db){
+    state.loaded = true;
+    setStatus("설정을 불러올 수 없습니다", true);
+    showNotice("<b>설정을 읽을 수 없는 화면입니다.</b> 로그인한 상태로 이 링크를 열면 부서와 발송 설정을 바꿀 수 있습니다. 지금 보이는 토글은 실제 설정이 아닙니다.");
+    paint();
+    return;
+  }
+
+  let user = null;
+  try { user = await window.claude.use("user"); } catch(e) {}
+  state.writable = user ? (user.can("data.write") !== false) : true;
+
+  doc = db.doc("config/monitoring");
+
+  doc.onSnapshot(snap => {
+    const v = snap && snap.data ? snap.data() : null;
+    if (v){
+      state.emailEnabled = !!v.emailEnabled;
+      state.emailMode = v.emailMode === "perDepartment" ? "perDepartment" : "combined";
+      state.recipients = Array.isArray(v.recipients) ? v.recipients : [];
+      state.departments = (v.departments && typeof v.departments === "object") ? Object.assign({}, v.departments) : {};
+      state.loaded = true;
+      setStatus(state.emailEnabled ? "발송 켜짐" : "발송 꺼짐");
+      if (v.updatedAt) $("#when").textContent = "마지막 저장 " + new Date(v.updatedAt).toLocaleString("ko-KR");
+      $("#notice").hidden = true;
+    } else {
+      state.loaded = true;
+      setStatus("아직 저장된 설정이 없습니다", true);
+      showNotice("<b>아직 아무것도 선택되지 않았습니다.</b> 아래에서 부서를 켜고 수신 주소를 넣으면 그 즉시 저장되고, 다음 실행부터 반영됩니다.");
+    }
+    paint();
+  }, err => {
+    setStatus("설정을 읽지 못했습니다", true);
+  });
+
+  $("#sw-email").addEventListener("click", () => { state.emailEnabled = !state.emailEnabled; paint(); queueSave(); });
+  document.querySelectorAll("#seg-mode button").forEach(b => {
+    b.addEventListener("click", () => { state.emailMode = b.dataset.mode; paint(); queueSave(); });
+  });
+  const inp = $("#recipients");
+  inp.addEventListener("change", () => {
+    state.recipients = inp.value.split(",").map(s => s.trim()).filter(Boolean);
+    paint(); queueSave();
+  });
+})();
+</script>

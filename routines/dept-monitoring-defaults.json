@@ -1,0 +1,7 @@
+{
+  "_comment": "Fallback used only when the routine cannot read the artifact config. The artifact at https://claude.ai/artifact/MaDYnjAE4cX9Lm311TkRoK is the source of truth.",
+  "emailEnabled": true,
+  "emailMode": "combined",
+  "recipients": ["hjlim1007@naver.com"],
+  "departments": { "finance": true, "risk": true, "general": true }
+}
