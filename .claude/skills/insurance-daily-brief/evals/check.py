@@ -45,7 +45,8 @@ def check(run_dir, kind):
 
     # --- 본문 16px 이상 (13·14px은 라벨용으로 허용) ---
     sizes = sorted({int(m) for m in re.findall(r'font-size:\s*(\d+)(?:\.\d+)?px', html)})
-    too_small = [s for s in sizes if s < 13 or s == 15]
+    # font-size:0 / 1px은 밴드·세로선 스페이서다. 읽는 글자만 본다.
+    too_small = [s for s in sizes if (1 < s < 13) or s == 15]
     r.append(result("본문을 16px 아래로 내리지 않았다 (라벨 13~14px만 허용)",
                     not too_small and 16 in sizes,
                     f"쓰인 크기 {sizes} · 위반 {too_small or '없음'}"))
@@ -72,7 +73,8 @@ def check(run_dir, kind):
                     (re.search(r'padding:[^";]*\b24px[^";]*', html).group(0) if re.search(r'padding:[^";]*\b24px', html) else "없음")))
 
     # --- 색 팔레트 ---
-    hexes = {h.lower() for h in re.findall(r'#[0-9a-fA-F]{3,6}', html)}
+    # &#9312; 같은 숫자 엔티티는 색이 아니다 — & 뒤의 #은 제외한다.
+    hexes = {h.lower() for h in re.findall(r'(?<!&)#[0-9a-fA-F]{3,6}\b', html)}
     off = sorted(hexes - PALETTE)
     r.append(result("지정 팔레트 안의 색만 썼다", not off, f"팔레트 외 {off or '없음'}"))
 
