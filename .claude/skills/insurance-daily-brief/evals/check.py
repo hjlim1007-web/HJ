@@ -108,11 +108,15 @@ def check(run_dir, kind):
                         all(p > -1 for p in pos) and pos == sorted(pos), f"위치 {pos}"))
 
     if kind == "weekend":
-        window_ok = ("10-16" in text or "10월 16" in text or "직전 영업일" in text)
-        is_24h = re.search(r"최근\s*24\s*시간", text) is not None
-        r.append(result("토요일 회차 조사 창을 직전 영업일(10/16 금) 이후로 넓혔다",
-                        window_ok and not is_24h,
-                        f"직전영업일 근거 {'있음' if window_ok else '없음'} · 24시간 창 {'씀' if is_24h else '안씀'}"))
+        # 머리말의 "조사 범위" 줄만 본다. 본문에서 평일 규칙을 설명하며
+        # "최근 24시간"을 인용하는 것은 정답이므로 벌점 대상이 아니다.
+        # 표기는 자유다("조사 범위"/"조사구간"/"research window"). 창의
+        # 시작점이 직전 영업일 10/16인지만 본다.
+        hdr = re.search(r'(?:조사\s*(?:범위|구간)|research\s*window)[^<]{0,160}', html, re.I)
+        line = hdr.group(0) if hdr else ""
+        starts_prev_biz = bool(re.search(r"10[./-]\s*16|10월\s*16", line))
+        r.append(result("머리말 조사 범위를 직전 영업일(10/16 금) 시작으로 적었다",
+                        starts_prev_biz, line[:200] or "조사 범위 줄을 찾지 못함"))
     return r
 
 if __name__ == "__main__":

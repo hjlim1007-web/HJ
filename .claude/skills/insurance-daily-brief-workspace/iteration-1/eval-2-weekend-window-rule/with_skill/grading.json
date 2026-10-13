@@ -1,0 +1,76 @@
+{
+  "expectations": [
+    {
+      "text": "메일 HTML을 산출했다",
+      "passed": true,
+      "evidence": "brief.html 27031바이트"
+    },
+    {
+      "text": "고정폭 속성 없이 유동폭(max-width:680px)으로 짰다",
+      "passed": true,
+      "evidence": "width=\"…\" 고정값 없음 · max-width:680px 있음"
+    },
+    {
+      "text": "본문을 16px 아래로 내리지 않았다 (라벨 13~14px만 허용)",
+      "passed": true,
+      "evidence": "쓰인 크기 [13, 14, 16, 19, 28] · 위반 없음"
+    },
+    {
+      "text": "고딕 서체 스택을 쓰고 세리프를 쓰지 않았다",
+      "passed": true,
+      "evidence": "고딕 스택 있음 · 세리프 없음"
+    },
+    {
+      "text": "미디어 쿼리·웹폰트·스크립트를 쓰지 않았다",
+      "passed": true,
+      "evidence": "@media 없음 · script 없음"
+    },
+    {
+      "text": "word-break:keep-all로 한글 단어 잘림을 막았다",
+      "passed": true,
+      "evidence": "있음"
+    },
+    {
+      "text": "숫자 칸에 white-space:nowrap을 줬다",
+      "passed": true,
+      "evidence": "있음"
+    },
+    {
+      "text": "좌우 여백 24px을 썼다",
+      "passed": true,
+      "evidence": "padding:30px 24px 0 24px"
+    },
+    {
+      "text": "지정 팔레트 안의 색만 썼다",
+      "passed": true,
+      "evidence": "팔레트 외 없음"
+    },
+    {
+      "text": "시사점을 \"모니터링이 필요하다\"로 끝내지 않았다",
+      "passed": true,
+      "evidence": "없음"
+    },
+    {
+      "text": "설정에서 켜진 8개 부서가 모두 섹션으로 들어갔다",
+      "passed": true,
+      "evidence": "누락 없음"
+    },
+    {
+      "text": "부서 블록에 3px #01c1d6 좌측 괘선을 뒀다",
+      "passed": true,
+      "evidence": "있음"
+    },
+    {
+      "text": "여러 부서에 걸린 기사를 (… 각도) 표시로 교차참조했다",
+      "passed": true,
+      "evidence": "있음"
+    },
+    {
+      "text": "머리말 조사 범위를 직전 영업일(10/16 금) 시작으로 적었다",
+      "passed": true,
+      "evidence": "조사 범위 10-16 08:00 &rarr; 10-17 08:00 KST (직전 영업일 10월 16일 금요일 아침 이후)"
+    }
+  ],
+  "passed": 14,
+  "total": 14
+}

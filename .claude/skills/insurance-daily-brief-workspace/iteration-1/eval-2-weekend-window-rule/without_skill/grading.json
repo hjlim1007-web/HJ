@@ -1,0 +1,76 @@
+{
+  "expectations": [
+    {
+      "text": "메일 HTML을 산출했다",
+      "passed": true,
+      "evidence": "brief.html 30691바이트"
+    },
+    {
+      "text": "고정폭 속성 없이 유동폭(max-width:680px)으로 짰다",
+      "passed": false,
+      "evidence": "width=\"…\" 고정값 ['680'] · max-width:680px 있음"
+    },
+    {
+      "text": "본문을 16px 아래로 내리지 않았다 (라벨 13~14px만 허용)",
+      "passed": false,
+      "evidence": "쓰인 크기 [1, 10, 11, 12, 13, 14, 15, 23] · 위반 [10, 11, 12, 15]"
+    },
+    {
+      "text": "고딕 서체 스택을 쓰고 세리프를 쓰지 않았다",
+      "passed": true,
+      "evidence": "고딕 스택 있음 · 세리프 없음"
+    },
+    {
+      "text": "미디어 쿼리·웹폰트·스크립트를 쓰지 않았다",
+      "passed": true,
+      "evidence": "@media 없음 · script 없음"
+    },
+    {
+      "text": "word-break:keep-all로 한글 단어 잘림을 막았다",
+      "passed": false,
+      "evidence": "없음"
+    },
+    {
+      "text": "숫자 칸에 white-space:nowrap을 줬다",
+      "passed": false,
+      "evidence": "없음"
+    },
+    {
+      "text": "좌우 여백 24px을 썼다",
+      "passed": true,
+      "evidence": "padding:24px 26px 4px 26px"
+    },
+    {
+      "text": "지정 팔레트 안의 색만 썼다",
+      "passed": false,
+      "evidence": "팔레트 외 ['#0b6dd8', '#10204a', '#1b4c9b', '#1e2a3f', '#2c3f6f', '#30405c', '#44506b', '#4a556b', '#5a6479', '#6b5200', '#7a5800', '#7a849a', '#8a93a3', '#8fa2c8', '#9aa3b2', '#a8b8d8', '#c3cbd8', '#c8102e', '#c8d3e8', '#d7dce3', '#d99e00', '#dde3eb', '#e8d9a8', '#e8eef9', '#eaedf1', '#edeff2', '#eff1f4', '#f0f3f7', '#f5f7fa', '#f7f8fa', '#fafbfc', '#fde8ec', '#fff6e0', '#fff9ea']"
+    },
+    {
+      "text": "시사점을 \"모니터링이 필요하다\"로 끝내지 않았다",
+      "passed": true,
+      "evidence": "없음"
+    },
+    {
+      "text": "설정에서 켜진 8개 부서가 모두 섹션으로 들어갔다",
+      "passed": false,
+      "evidence": "누락 ['수당', 'Risk Management', '일반계정운용', '특별계정운용']"
+    },
+    {
+      "text": "부서 블록에 3px #01c1d6 좌측 괘선을 뒀다",
+      "passed": false,
+      "evidence": "없음"
+    },
+    {
+      "text": "여러 부서에 걸린 기사를 (… 각도) 표시로 교차참조했다",
+      "passed": false,
+      "evidence": "없음"
+    },
+    {
+      "text": "머리말 조사 범위를 직전 영업일(10/16 금) 시작으로 적었다",
+      "passed": true,
+      "evidence": "조사구간 10/16(금) 07:00 ~ 10/17(토) 07:00 KST · 시장지표는 금요일 종가 고정 · 주말 휴장"
+    }
+  ],
+  "passed": 6,
+  "total": 14
+}
