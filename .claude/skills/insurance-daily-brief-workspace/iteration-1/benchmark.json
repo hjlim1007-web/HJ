@@ -1,0 +1,586 @@
+{
+  "metadata": {
+    "skill_name": "insurance-daily-brief",
+    "skill_path": "/home/user/HJ/.claude/skills/insurance-daily-brief",
+    "executor_model": "claude-opus-5",
+    "analyzer_model": "claude-opus-5",
+    "timestamp": "2026-10-13T12:30:00Z",
+    "evals_run": [
+      0,
+      1,
+      2
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "eval-0-dept-monitoring-layout",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 13,
+        "failed": 0,
+        "total": 13,
+        "time_seconds": 632.9,
+        "tokens": 141948,
+        "tool_calls": 33,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "메일 HTML을 산출했다",
+          "passed": true,
+          "evidence": "brief.html 28766바이트"
+        },
+        {
+          "text": "고정폭 속성 없이 유동폭(max-width:680px)으로 짰다",
+          "passed": true,
+          "evidence": "width=\"…\" 고정값 없음 · max-width:680px 있음"
+        },
+        {
+          "text": "본문을 16px 아래로 내리지 않았다 (라벨 13~14px만 허용)",
+          "passed": true,
+          "evidence": "쓰인 크기 [13, 14, 16, 19, 28] · 위반 없음"
+        },
+        {
+          "text": "고딕 서체 스택을 쓰고 세리프를 쓰지 않았다",
+          "passed": true,
+          "evidence": "고딕 스택 있음 · 세리프 없음"
+        },
+        {
+          "text": "미디어 쿼리·웹폰트·스크립트를 쓰지 않았다",
+          "passed": true,
+          "evidence": "@media 없음 · script 없음"
+        },
+        {
+          "text": "word-break:keep-all로 한글 단어 잘림을 막았다",
+          "passed": true,
+          "evidence": "있음"
+        },
+        {
+          "text": "숫자 칸에 white-space:nowrap을 줬다",
+          "passed": true,
+          "evidence": "있음"
+        },
+        {
+          "text": "좌우 여백 24px을 썼다",
+          "passed": true,
+          "evidence": "padding:30px 24px 0 24px"
+        },
+        {
+          "text": "지정 팔레트 안의 색만 썼다",
+          "passed": true,
+          "evidence": "팔레트 외 없음"
+        },
+        {
+          "text": "시사점을 \"모니터링이 필요하다\"로 끝내지 않았다",
+          "passed": true,
+          "evidence": "없음"
+        },
+        {
+          "text": "설정에서 켜진 8개 부서가 모두 섹션으로 들어갔다",
+          "passed": true,
+          "evidence": "누락 없음"
+        },
+        {
+          "text": "부서 블록에 3px #01c1d6 좌측 괘선을 뒀다",
+          "passed": true,
+          "evidence": "있음"
+        },
+        {
+          "text": "여러 부서에 걸린 기사를 (… 각도) 표시로 교차참조했다",
+          "passed": true,
+          "evidence": "있음"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "eval-0-dept-monitoring-layout",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.385,
+        "passed": 5,
+        "failed": 8,
+        "total": 13,
+        "time_seconds": 562.4,
+        "tokens": 115063,
+        "tool_calls": 30,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "메일 HTML을 산출했다",
+          "passed": true,
+          "evidence": "brief.html 27222바이트"
+        },
+        {
+          "text": "고정폭 속성 없이 유동폭(max-width:680px)으로 짰다",
+          "passed": false,
+          "evidence": "width=\"…\" 고정값 ['600'] · max-width:680px 없음"
+        },
+        {
+          "text": "본문을 16px 아래로 내리지 않았다 (라벨 13~14px만 허용)",
+          "passed": false,
+          "evidence": "쓰인 크기 [1, 11, 12, 13, 14, 25] · 위반 [11, 12]"
+        },
+        {
+          "text": "고딕 서체 스택을 쓰고 세리프를 쓰지 않았다",
+          "passed": true,
+          "evidence": "고딕 스택 있음 · 세리프 없음"
+        },
+        {
+          "text": "미디어 쿼리·웹폰트·스크립트를 쓰지 않았다",
+          "passed": true,
+          "evidence": "@media 없음 · script 없음"
+        },
+        {
+          "text": "word-break:keep-all로 한글 단어 잘림을 막았다",
+          "passed": false,
+          "evidence": "없음"
+        },
+        {
+          "text": "숫자 칸에 white-space:nowrap을 줬다",
+          "passed": false,
+          "evidence": "없음"
+        },
+        {
+          "text": "좌우 여백 24px을 썼다",
+          "passed": true,
+          "evidence": "padding:24px 28px 26px 28px"
+        },
+        {
+          "text": "지정 팔레트 안의 색만 썼다",
+          "passed": false,
+          "evidence": "팔레트 외 ['#141b4d', '#1d6fa5', '#1e2a5e', '#23293a', '#444b5e', '#4a3f23', '#4a568f', '#6b3b2e', '#6b7280', '#8a7021', '#8a909f', '#9ba8cf', '#a5442a', '#b98d3e', '#c0392b', '#c8d0e8', '#dce0ea', '#e6cfc8', '#edeff4', '#eef0f4', '#f5f6fa', '#faf7f0', '#fafbfd', '#fbf4f2']"
+        },
+        {
+          "text": "시사점을 \"모니터링이 필요하다\"로 끝내지 않았다",
+          "passed": true,
+          "evidence": "없음"
+        },
+        {
+          "text": "설정에서 켜진 8개 부서가 모두 섹션으로 들어갔다",
+          "passed": false,
+          "evidence": "누락 ['수당', 'Risk Management', '일반계정운용', '특별계정운용']"
+        },
+        {
+          "text": "부서 블록에 3px #01c1d6 좌측 괘선을 뒀다",
+          "passed": false,
+          "evidence": "없음"
+        },
+        {
+          "text": "여러 부서에 걸린 기사를 (… 각도) 표시로 교차참조했다",
+          "passed": false,
+          "evidence": "없음"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1-morning-brief-sections",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 13,
+        "failed": 0,
+        "total": 13,
+        "time_seconds": 995.0,
+        "tokens": 173273,
+        "tool_calls": 49,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "메일 HTML을 산출했다",
+          "passed": true,
+          "evidence": "brief.html 36613바이트"
+        },
+        {
+          "text": "고정폭 속성 없이 유동폭(max-width:680px)으로 짰다",
+          "passed": true,
+          "evidence": "width=\"…\" 고정값 없음 · max-width:680px 있음"
+        },
+        {
+          "text": "본문을 16px 아래로 내리지 않았다 (라벨 13~14px만 허용)",
+          "passed": true,
+          "evidence": "쓰인 크기 [13, 14, 16, 19, 28] · 위반 없음"
+        },
+        {
+          "text": "고딕 서체 스택을 쓰고 세리프를 쓰지 않았다",
+          "passed": true,
+          "evidence": "고딕 스택 있음 · 세리프 없음"
+        },
+        {
+          "text": "미디어 쿼리·웹폰트·스크립트를 쓰지 않았다",
+          "passed": true,
+          "evidence": "@media 없음 · script 없음"
+        },
+        {
+          "text": "word-break:keep-all로 한글 단어 잘림을 막았다",
+          "passed": true,
+          "evidence": "있음"
+        },
+        {
+          "text": "숫자 칸에 white-space:nowrap을 줬다",
+          "passed": true,
+          "evidence": "있음"
+        },
+        {
+          "text": "좌우 여백 24px을 썼다",
+          "passed": true,
+          "evidence": "padding:30px 24px 0 24px"
+        },
+        {
+          "text": "지정 팔레트 안의 색만 썼다",
+          "passed": true,
+          "evidence": "팔레트 외 없음"
+        },
+        {
+          "text": "시사점을 \"모니터링이 필요하다\"로 끝내지 않았다",
+          "passed": true,
+          "evidence": "없음"
+        },
+        {
+          "text": "환율표에 원/달러·원/유로·원/엔(100엔당)을 모두 넣었다",
+          "passed": true,
+          "evidence": "통화 ['달러', '유로', '엔'] · 100엔 표기 있음"
+        },
+        {
+          "text": "'오늘의 핵심 5줄'을 넣었다",
+          "passed": true,
+          "evidence": "있음"
+        },
+        {
+          "text": "섹션 순서가 지표 → 거시 → … → 세법·세무다",
+          "passed": true,
+          "evidence": "지표 2571 · 거시 12636 · 세법 30652"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1-morning-brief-sections",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.462,
+        "passed": 6,
+        "failed": 7,
+        "total": 13,
+        "time_seconds": 362.0,
+        "tokens": 89352,
+        "tool_calls": 18,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "메일 HTML을 산출했다",
+          "passed": true,
+          "evidence": "brief.html 15283바이트"
+        },
+        {
+          "text": "고정폭 속성 없이 유동폭(max-width:680px)으로 짰다",
+          "passed": false,
+          "evidence": "width=\"…\" 고정값 ['680'] · max-width:680px 있음"
+        },
+        {
+          "text": "본문을 16px 아래로 내리지 않았다 (라벨 13~14px만 허용)",
+          "passed": false,
+          "evidence": "쓰인 크기 [1, 11, 12, 13, 19] · 위반 [11, 12]"
+        },
+        {
+          "text": "고딕 서체 스택을 쓰고 세리프를 쓰지 않았다",
+          "passed": true,
+          "evidence": "고딕 스택 있음 · 세리프 없음"
+        },
+        {
+          "text": "미디어 쿼리·웹폰트·스크립트를 쓰지 않았다",
+          "passed": true,
+          "evidence": "@media 없음 · script 없음"
+        },
+        {
+          "text": "word-break:keep-all로 한글 단어 잘림을 막았다",
+          "passed": false,
+          "evidence": "없음"
+        },
+        {
+          "text": "숫자 칸에 white-space:nowrap을 줬다",
+          "passed": false,
+          "evidence": "없음"
+        },
+        {
+          "text": "좌우 여백 24px을 썼다",
+          "passed": true,
+          "evidence": "padding:24px 12px"
+        },
+        {
+          "text": "지정 팔레트 안의 색만 썼다",
+          "passed": false,
+          "evidence": "팔레트 외 ['#0b6ba8', '#2e2a28', '#38332f', '#45403c', '#5a534e', '#5e1220', '#6b645f', '#8b1a2b', '#8b847e', '#b08a90', '#d8d5d1', '#e2ded9', '#e6e1dc', '#e8b9c1', '#eeebe7', '#f0cdd3', '#f0efed', '#f4f1ee', '#f7f4f1', '#faf7f4']"
+        },
+        {
+          "text": "시사점을 \"모니터링이 필요하다\"로 끝내지 않았다",
+          "passed": true,
+          "evidence": "없음"
+        },
+        {
+          "text": "환율표에 원/달러·원/유로·원/엔(100엔당)을 모두 넣었다",
+          "passed": false,
+          "evidence": "통화 ['달러'] · 100엔 표기 없음"
+        },
+        {
+          "text": "'오늘의 핵심 5줄'을 넣었다",
+          "passed": false,
+          "evidence": "없음"
+        },
+        {
+          "text": "섹션 순서가 지표 → 거시 → … → 세법·세무다",
+          "passed": true,
+          "evidence": "지표 2345 · 거시 6587 · 세법 11278"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2-weekend-window-rule",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 14,
+        "failed": 0,
+        "total": 14,
+        "time_seconds": 596.7,
+        "tokens": 131885,
+        "tool_calls": 32,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "메일 HTML을 산출했다",
+          "passed": true,
+          "evidence": "brief.html 27031바이트"
+        },
+        {
+          "text": "고정폭 속성 없이 유동폭(max-width:680px)으로 짰다",
+          "passed": true,
+          "evidence": "width=\"…\" 고정값 없음 · max-width:680px 있음"
+        },
+        {
+          "text": "본문을 16px 아래로 내리지 않았다 (라벨 13~14px만 허용)",
+          "passed": true,
+          "evidence": "쓰인 크기 [13, 14, 16, 19, 28] · 위반 없음"
+        },
+        {
+          "text": "고딕 서체 스택을 쓰고 세리프를 쓰지 않았다",
+          "passed": true,
+          "evidence": "고딕 스택 있음 · 세리프 없음"
+        },
+        {
+          "text": "미디어 쿼리·웹폰트·스크립트를 쓰지 않았다",
+          "passed": true,
+          "evidence": "@media 없음 · script 없음"
+        },
+        {
+          "text": "word-break:keep-all로 한글 단어 잘림을 막았다",
+          "passed": true,
+          "evidence": "있음"
+        },
+        {
+          "text": "숫자 칸에 white-space:nowrap을 줬다",
+          "passed": true,
+          "evidence": "있음"
+        },
+        {
+          "text": "좌우 여백 24px을 썼다",
+          "passed": true,
+          "evidence": "padding:30px 24px 0 24px"
+        },
+        {
+          "text": "지정 팔레트 안의 색만 썼다",
+          "passed": true,
+          "evidence": "팔레트 외 없음"
+        },
+        {
+          "text": "시사점을 \"모니터링이 필요하다\"로 끝내지 않았다",
+          "passed": true,
+          "evidence": "없음"
+        },
+        {
+          "text": "설정에서 켜진 8개 부서가 모두 섹션으로 들어갔다",
+          "passed": true,
+          "evidence": "누락 없음"
+        },
+        {
+          "text": "부서 블록에 3px #01c1d6 좌측 괘선을 뒀다",
+          "passed": true,
+          "evidence": "있음"
+        },
+        {
+          "text": "여러 부서에 걸린 기사를 (… 각도) 표시로 교차참조했다",
+          "passed": true,
+          "evidence": "있음"
+        },
+        {
+          "text": "머리말 조사 범위를 직전 영업일(10/16 금) 시작으로 적었다",
+          "passed": true,
+          "evidence": "조사 범위 10-16 08:00 &rarr; 10-17 08:00 KST (직전 영업일 10월 16일 금요일 아침 이후)"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2-weekend-window-rule",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.429,
+        "passed": 6,
+        "failed": 8,
+        "total": 14,
+        "time_seconds": 593.1,
+        "tokens": 108974,
+        "tool_calls": 23,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "메일 HTML을 산출했다",
+          "passed": true,
+          "evidence": "brief.html 30691바이트"
+        },
+        {
+          "text": "고정폭 속성 없이 유동폭(max-width:680px)으로 짰다",
+          "passed": false,
+          "evidence": "width=\"…\" 고정값 ['680'] · max-width:680px 있음"
+        },
+        {
+          "text": "본문을 16px 아래로 내리지 않았다 (라벨 13~14px만 허용)",
+          "passed": false,
+          "evidence": "쓰인 크기 [1, 10, 11, 12, 13, 14, 15, 23] · 위반 [10, 11, 12, 15]"
+        },
+        {
+          "text": "고딕 서체 스택을 쓰고 세리프를 쓰지 않았다",
+          "passed": true,
+          "evidence": "고딕 스택 있음 · 세리프 없음"
+        },
+        {
+          "text": "미디어 쿼리·웹폰트·스크립트를 쓰지 않았다",
+          "passed": true,
+          "evidence": "@media 없음 · script 없음"
+        },
+        {
+          "text": "word-break:keep-all로 한글 단어 잘림을 막았다",
+          "passed": false,
+          "evidence": "없음"
+        },
+        {
+          "text": "숫자 칸에 white-space:nowrap을 줬다",
+          "passed": false,
+          "evidence": "없음"
+        },
+        {
+          "text": "좌우 여백 24px을 썼다",
+          "passed": true,
+          "evidence": "padding:24px 26px 4px 26px"
+        },
+        {
+          "text": "지정 팔레트 안의 색만 썼다",
+          "passed": false,
+          "evidence": "팔레트 외 ['#0b6dd8', '#10204a', '#1b4c9b', '#1e2a3f', '#2c3f6f', '#30405c', '#44506b', '#4a556b', '#5a6479', '#6b5200', '#7a5800', '#7a849a', '#8a93a3', '#8fa2c8', '#9aa3b2', '#a8b8d8', '#c3cbd8', '#c8102e', '#c8d3e8', '#d7dce3', '#d99e00', '#dde3eb', '#e8d9a8', '#e8eef9', '#eaedf1', '#edeff2', '#eff1f4', '#f0f3f7', '#f5f7fa', '#f7f8fa', '#fafbfc', '#fde8ec', '#fff6e0', '#fff9ea']"
+        },
+        {
+          "text": "시사점을 \"모니터링이 필요하다\"로 끝내지 않았다",
+          "passed": true,
+          "evidence": "없음"
+        },
+        {
+          "text": "설정에서 켜진 8개 부서가 모두 섹션으로 들어갔다",
+          "passed": false,
+          "evidence": "누락 ['수당', 'Risk Management', '일반계정운용', '특별계정운용']"
+        },
+        {
+          "text": "부서 블록에 3px #01c1d6 좌측 괘선을 뒀다",
+          "passed": false,
+          "evidence": "없음"
+        },
+        {
+          "text": "여러 부서에 걸린 기사를 (… 각도) 표시로 교차참조했다",
+          "passed": false,
+          "evidence": "없음"
+        },
+        {
+          "text": "머리말 조사 범위를 직전 영업일(10/16 금) 시작으로 적었다",
+          "passed": true,
+          "evidence": "조사구간 10/16(금) 07:00 ~ 10/17(토) 07:00 KST · 시장지표는 금요일 종가 고정 · 주말 휴장"
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 741.533,
+        "stddev": 179.836,
+        "min": 596.7,
+        "max": 995.0
+      },
+      "tokens": {
+        "mean": 149035.333,
+        "stddev": 17624.119,
+        "min": 131885,
+        "max": 173273
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.425,
+        "stddev": 0.032,
+        "min": 0.38461538461538464,
+        "max": 0.46153846153846156
+      },
+      "time_seconds": {
+        "mean": 505.833,
+        "stddev": 102.475,
+        "min": 362.0,
+        "max": 593.1
+      },
+      "tokens": {
+        "mean": 104463,
+        "stddev": 10970.437,
+        "min": 89352,
+        "max": 115063
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.57",
+      "time_seconds": "+235.7",
+      "tokens": "+44572"
+    }
+  },
+  "notes": [
+    "조판 항목(고정폭·글자크기·keep-all·nowrap·팔레트)은 스킬 없이 돌린 3회 모두 실패했다 — 변별력이 가장 큰 축이다.",
+    "부서 선별 항목도 3회 모두 실패했다. 설정을 읽지 않고 부서 이름을 임의로 지어내 실제로 켜 둔 수당·Risk Management·일반계정운용·특별계정운용이 빠졌다.",
+    "'메일 HTML을 산출했다'와 '모니터링이 필요하다로 끝내지 않았다'는 양쪽 다 전부 통과 — 변별력이 없으므로 다음 회차에서 교체할 후보다.",
+    "eval-2(토요일 조사 창)는 변별력이 없었다. 스킬 없이도 같은 창(10/16 금 아침 시작)을 자기 논리로 추론해 맞혔다. 이 규칙의 값은 토요일이 아니라 일·월·연휴 회차에서 나타난다.",
+    "채점기에서 내 쪽 오탐 3건을 고쳤다 — HTML 숫자 엔티티를 색으로 오인, 본문에서 평일 규칙을 인용한 '최근 24시간'을 벌점 처리, 섹션 순서를 '세' 한 글자로 탐색. 조판 항목은 처음부터 안정적이었고 내용 항목이 전부 깨졌다.",
+    "스킬 쪽이 토큰을 약 40% 더 쓴다(평균 15.6만 vs 10.4만). 참조 파일 2개를 읽고 검색을 더 돌리기 때문이며, 조판·선별 정확도와 맞바꾼 비용이다."
+  ]
+}

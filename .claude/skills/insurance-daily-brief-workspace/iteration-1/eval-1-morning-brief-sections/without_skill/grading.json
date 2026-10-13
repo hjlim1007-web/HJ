@@ -61,11 +61,11 @@
       "evidence": "없음"
     },
     {
-      "text": "섹션 순서가 지표 → 거시 → … → 세무다",
-      "passed": false,
-      "evidence": "위치 [2345, 6587, 411]"
+      "text": "섹션 순서가 지표 → 거시 → … → 세법·세무다",
+      "passed": true,
+      "evidence": "지표 2345 · 거시 6587 · 세법 11278"
     }
   ],
-  "passed": 5,
+  "passed": 6,
   "total": 13
 }

@@ -102,10 +102,14 @@ def check(run_dir, kind):
                         f"통화 {pairs} · 100엔 표기 {'있음' if has_100yen else '없음'}"))
         r.append(result("'오늘의 핵심 5줄'을 넣었다", "핵심" in html and "5줄" in html,
                         "있음" if ("핵심" in html and "5줄" in html) else "없음"))
-        order_keys = ["시장 지표", "거시", "세"]
-        pos = [html.find(k) for k in order_keys]
-        r.append(result("섹션 순서가 지표 → 거시 → … → 세무다",
-                        all(p > -1 for p in pos) and pos == sorted(pos), f"위치 {pos}"))
+        # 섹션 머리말만 본다. "세" 한 글자로 찾으면 경제·시세·정세에 걸린다.
+        def first(*alts):
+            ps = [html.find(a) for a in alts if html.find(a) > -1]
+            return min(ps) if ps else -1
+        pos = [first("시장 지표"), first("거시"), first("세법", "세무")]
+        r.append(result("섹션 순서가 지표 → 거시 → … → 세법·세무다",
+                        all(x > -1 for x in pos) and pos == sorted(pos),
+                        f"지표 {pos[0]} · 거시 {pos[1]} · 세법 {pos[2]}"))
 
     if kind == "weekend":
         # 머리말의 "조사 범위" 줄만 본다. 본문에서 평일 규칙을 설명하며
