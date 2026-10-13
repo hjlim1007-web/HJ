@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="1~9 중 서로 다른 숫자를 스트라이크·볼 판정만으로 9이닝 안에 맞히는 숫자야구 게임.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:type" content="website">
+<meta property="og:title" content="숫자야구 전광판">
+<meta property="og:description" content="1~9 중 서로 다른 숫자를 스트라이크·볼 판정만으로 9이닝 안에 맞히는 숫자야구 게임.">
+<style>
+/* 아티팩트 런타임이 붙여 주는 기본 리셋과 동일 */
+:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;font:14px system-ui,-apple-system,"Segoe UI",sans-serif}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+<title>숫자야구 전광판</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+/* Layout: 기록지 한 장 — 상단 전광판, 아래 2단(타석 키패드 / 이닝 기록), 폰에서는 1단으로 쌓임 */
+:root{
+  --bg:#e7eae2;
+  --sheet:#f7f8f3;
+  --ink:#16201b;
+  --muted:#5e6d64;
+  --line:#c7cfc3;
+  --panel:#18241f;
+  --panel-line:#2f4037;
+  --bulb:#e8a62e;
+  --bulb-off:#4b4332;
+  --clay:#ad4126;
+  --field:#1d6950;
+  --font-display:"Black Han Sans","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --font-body:"IBM Plex Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#101714; --sheet:#18211d; --ink:#e7ebe4; --muted:#93a399; --line:#2b3832;
+    --panel:#0b120f; --panel-line:#263530; --bulb:#f0b348; --bulb-off:#514835;
+    --clay:#e07a53; --field:#4fb28d; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#101714; --sheet:#18211d; --ink:#e7ebe4; --muted:#93a399; --line:#2b3832;
+  --panel:#0b120f; --panel-line:#263530; --bulb:#f0b348; --bulb-off:#514835;
+  --clay:#e07a53; --field:#4fb28d; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.5;
+  padding-block:16px 28px;padding-left:16px;padding-right:16px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+
+/* 전광판 */
+.board{background:var(--panel);border:1px solid var(--panel-line);border-radius:4px;
+  padding:13px 16px;display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 22px;
+  background-image:radial-gradient(rgba(255,255,255,.055) 1px, transparent 1.4px);
+  background-size:7px 7px}
+.board h1{font-family:var(--font-display);font-size:clamp(23px,5.5vw,34px);line-height:1;margin:0;
+  color:var(--bulb);letter-spacing:.02em;text-wrap:balance;
+  text-shadow:0 0 14px rgba(232,166,46,.28)}
+.board .sub{margin:5px 0 0;color:#8c9b92;font-size:12px;letter-spacing:.02em}
+.board .spacer{flex:1 1 40px;min-width:0}
+.gauges{display:flex;gap:14px}
+.gauge{text-align:center;min-width:48px}
+.gauge .k{font-size:9.5px;letter-spacing:.14em;color:#7c8a81;font-weight:600}
+.gauge .v{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-size:23px;font-weight:600;
+  color:var(--bulb);line-height:1.1;text-shadow:0 0 12px rgba(232,166,46,.3)}
+.gauge .v.dim{color:var(--bulb-off);text-shadow:none}
+
+/* 공통 패널 */
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+.card{background:var(--sheet);border:1px solid var(--line);border-radius:3px;padding:14px}
+.card > h2{font-family:var(--font-display);font-size:14px;letter-spacing:.06em;margin:0 0 10px;
+  color:var(--ink);font-weight:400;display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.card > h2 span{font-family:var(--font-body);font-size:11.5px;letter-spacing:.1em;color:var(--muted);font-weight:600}
+
+/* 타석 */
+.slots{display:flex;gap:8px;justify-content:center;margin-bottom:12px}
+.slot{width:44px;height:52px;border:1px solid var(--line);border-bottom:3px solid var(--ink);
+  border-radius:2px;background:var(--bg);display:grid;place-items:center;
+  font-family:var(--font-mono);font-size:24px;font-weight:600;font-variant-numeric:tabular-nums}
+.slot.empty{color:var(--line);border-bottom-color:var(--line)}
+.slot.on{border-bottom-color:var(--clay)}
+.slot.fire{border-bottom-color:var(--field);animation:fire .2s ease}
+@keyframes fire{from{transform:translateY(-3px)}to{transform:none}}
+.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:216px;margin:0 auto}
+button{font:inherit;color:inherit;cursor:pointer}
+.key{height:40px;border:1px solid var(--line);background:var(--bg);border-radius:2px;
+  font-family:var(--font-mono);font-size:17px;font-weight:600;transition:transform .08s ease,background .12s ease}
+.key:hover:not(:disabled){background:var(--sheet);border-color:var(--ink)}
+.key:active:not(:disabled){transform:translateY(1px)}
+.key:disabled{color:var(--line);background:transparent;cursor:not-allowed}
+.acts{display:flex;max-width:216px;margin:8px auto 0}
+.acts button{flex:1;padding:9px 8px;border-radius:2px;border:1px solid var(--line);
+  background:transparent;color:var(--muted);font-weight:600;font-size:12.5px;letter-spacing:.02em}
+.acts button:hover:not(:disabled){border-color:var(--ink);color:var(--ink)}
+.acts button:disabled{opacity:.4;cursor:not-allowed}
+.msg{margin:10px 0 0;min-height:19px;font-size:12.5px;color:var(--clay);font-weight:500;text-align:center}
+
+/* 기록 */
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:5px 4px;border-bottom:1px solid var(--line);font-size:13px}
+th{font-size:10.5px;letter-spacing:.14em;color:var(--muted);font-weight:600;border-bottom-color:var(--ink)}
+td.n{color:var(--muted);font-family:var(--font-mono);width:3.2em}
+td.g{font-family:var(--font-mono);font-size:17px;font-weight:600;letter-spacing:.12em}
+td.r{text-align:right;font-family:var(--font-mono);font-weight:600}
+.s{color:var(--field)}
+.b{color:var(--clay)}
+.o{color:var(--muted);letter-spacing:.06em;font-family:var(--font-body);font-size:12.5px}
+tr.new td{animation:slide .22s ease both}
+@keyframes slide{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
+.idle{color:var(--muted);font-size:13px;padding-top:10px}
+.hint{margin:10px 0 0;font-size:11.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:8px}
+.hint b{font-family:var(--font-mono);color:var(--ink)}
+
+/* 결과 */
+.over{border:1px solid var(--ink);background:var(--sheet);border-radius:3px;padding:16px 18px;
+  display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px}
+.over .big{font-family:var(--font-display);font-size:22px}
+.over .big.win{color:var(--field)}
+.over .big.lose{color:var(--clay)}
+.over p{margin:0;font-size:13.5px;color:var(--muted);flex:1 1 180px;min-width:0}
+.over p b{font-family:var(--font-mono);font-size:19px;color:var(--ink);letter-spacing:.1em}
+.over button{padding:11px 20px;border:1px solid var(--ink);background:var(--ink);color:var(--sheet);
+  border-radius:2px;font-weight:600}
+
+.setup{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:12.5px;color:var(--muted)}
+.setup .seg{display:flex;border:1px solid var(--line);border-radius:2px;overflow:hidden}
+.setup .seg button{padding:6px 11px;background:transparent;border:0;font-size:12.5px;font-weight:600;color:var(--muted)}
+.setup .seg button[aria-pressed="true"]{background:var(--ink);color:var(--sheet)}
+.rules{font-size:11.5px;color:var(--muted);line-height:1.6;margin:10px 0 0}
+.rules b{color:var(--ink)}
+@media (max-width:760px){
+  .cols{grid-template-columns:minmax(0,1fr)}
+  .board{gap:10px 16px}
+  .gauges{gap:8px;width:100%;justify-content:space-between}
+  .gauge{min-width:0;flex:1}
+  .keys,.acts{max-width:260px}
+  .key{height:44px;font-size:18px}
+}
+@media (max-width:360px){
+  .slot{width:38px;height:46px;font-size:21px}
+  .key{height:40px}
+}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+:focus-visible{outline:2px solid var(--clay);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="board">
+    <div>
+      <h1>숫자야구 전광판</h1>
+      <p class="sub">서로 다른 숫자를 맞혀 9이닝 안에 경기를 끝내세요 · 마지막 자리를 누르면 자동 투구</p>
+    </div>
+    <div class="spacer"></div>
+    <div class="gauges">
+      <div class="gauge"><div class="k">INNING</div><div class="v" id="g-inning">1</div></div>
+      <div class="gauge"><div class="k">STRIKE</div><div class="v dim" id="g-s">0</div></div>
+      <div class="gauge"><div class="k">BALL</div><div class="v dim" id="g-b">0</div></div>
+      <div class="gauge"><div class="k">OUT</div><div class="v dim" id="g-o">0</div></div>
+    </div>
+  </header>
+
+  <div id="over" class="over" hidden>
+    <span class="big" id="over-big"></span>
+    <p id="over-text"></p>
+    <button type="button" id="again">새 경기</button>
+  </div>
+
+  <div class="cols">
+    <section class="card">
+      <h2>타석 <span id="left-label">남은 이닝 9</span></h2>
+      <div class="slots" id="slots" aria-label="입력한 숫자"></div>
+      <div class="keys" id="keys"></div>
+      <div class="acts">
+        <button type="button" id="clear">지우기</button>
+      </div>
+      <p class="msg" id="msg" role="status" aria-live="polite"></p>
+      <div class="setup" style="margin-top:14px">
+        <span>자리수</span>
+        <div class="seg" role="group" aria-label="자리수 선택">
+          <button type="button" data-len="3" aria-pressed="true">3자리</button>
+          <button type="button" data-len="4" aria-pressed="false">4자리</button>
+        </div>
+        <span id="best"></span>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>이닝 기록 <span id="cand-label"></span></h2>
+      <table>
+        <thead><tr><th>회</th><th>투구</th><th style="text-align:right">판정</th></tr></thead>
+        <tbody id="log"></tbody>
+      </table>
+      <p class="idle" id="idle">1회 선두타자 타석. 1~9 중 서로 다른 숫자를 누르면 마지막 자리에서 바로 투구됩니다.</p>
+      <p class="rules">
+        <b>스트라이크</b> 숫자와 자리가 모두 맞음 · <b>볼</b> 숫자는 있으나 자리가 다름 · <b>아웃</b> 맞는 숫자 없음<br>
+        정답에 0은 쓰지 않고, 같은 숫자는 두 번 나오지 않습니다.
+      </p>
+      <p class="hint" id="hint"></p>
+    </section>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var DIGITS = [1,2,3,4,5,6,7,8,9];
+  var state = { len:3, innings:9, secret:"", input:[], history:[], over:false, won:false, pending:false };
+  var permCache = {};
+
+  function perms(len){
+    if (permCache[len]) return permCache[len];
+    var out = [];
+    (function rec(cur, used){
+      if (cur.length === len) { out.push(cur.join("")); return; }
+      for (var i=0;i<DIGITS.length;i++){
+        var d = DIGITS[i];
+        if (used[d]) continue;
+        used[d] = 1; cur.push(d);
+        rec(cur, used);
+        cur.pop(); used[d] = 0;
+      }
+    })([], {});
+    permCache[len] = out;
+    return out;
+  }
+
+  function judge(secret, guess){
+    var s = 0, b = 0;
+    for (var i=0;i<guess.length;i++){
+      if (guess[i] === secret[i]) s++;
+      else if (secret.indexOf(guess[i]) !== -1) b++;
+    }
+    return { s:s, b:b };
+  }
+
+  function candidates(){
+    var all = perms(state.len);
+    if (!state.history.length) return all.length;
+    var n = 0;
+    for (var i=0;i<all.length;i++){
+      var ok = true;
+      for (var j=0;j<state.history.length;j++){
+        var h = state.history[j], r = judge(all[i], h.guess);
+        if (r.s !== h.s || r.b !== h.b) { ok = false; break; }
+      }
+      if (ok) n++;
+    }
+    return n;
+  }
+
+  function bestKey(){ return "sb-best-" + state.len; }
+  function readBest(){ try { return parseInt(localStorage.getItem(bestKey()), 10) || 0; } catch(e){ return 0; } }
+  function writeBest(v){ try { localStorage.setItem(bestKey(), String(v)); } catch(e){} }
+
+  function newSecret(len){
+    var pool = DIGITS.slice(), out = [];
+    for (var i=0;i<len;i++){
+      var k = Math.floor(Math.random() * pool.length);
+      out.push(pool.splice(k,1)[0]);
+    }
+    return out.join("");
+  }
+
+  function reset(len){
+    state.len = len || state.len;
+    state.innings = state.len === 3 ? 9 : 12;
+    state.secret = newSecret(state.len);
+    state.input = [];
+    state.history = [];
+    state.over = false;
+    state.won = false;
+    state.pending = false;
+    render();
+  }
+
+  var $ = function(id){ return document.getElementById(id); };
+  var elSlots = $("slots"), elKeys = $("keys"), elLog = $("log");
+
+  // 키패드는 한 번만 그린다
+  for (var d=1; d<=9; d++){
+    var btn = document.createElement("button");
+    btn.type = "button"; btn.className = "key"; btn.dataset.digit = String(d); btn.textContent = String(d);
+    elKeys.appendChild(btn);
+  }
+
+  function renderSlots(){
+    elSlots.innerHTML = "";
+    for (var i=0;i<state.len;i++){
+      var cell = document.createElement("div");
+      var v = state.input[i];
+      cell.className = "slot " + (v ? (state.pending ? "on fire" : "on") : "empty");
+      cell.textContent = v ? String(v) : "·";
+      elSlots.appendChild(cell);
+    }
+  }
+
+  function renderLog(newRow){
+    elLog.innerHTML = "";
+    state.history.forEach(function(h, i){
+      var tr = document.createElement("tr");
+      if (newRow && i === state.history.length - 1) tr.className = "new";
+      var verdict = (h.s === 0 && h.b === 0)
+        ? '<span class="o">아웃</span>'
+        : (h.s ? '<span class="s">' + h.s + 'S</span>' : '') + (h.s && h.b ? ' ' : '') + (h.b ? '<span class="b">' + h.b + 'B</span>' : '');
+      tr.innerHTML = '<td class="n">' + (i+1) + '회</td><td class="g">' + h.guess.split("").join(" ") + '</td><td class="r">' + verdict + '</td>';
+      elLog.appendChild(tr);
+    });
+    $("idle").hidden = state.history.length > 0;
+  }
+
+  function render(newRow){
+    var last = state.history[state.history.length - 1];
+    var outs = state.history.filter(function(h){ return h.s === 0 && h.b === 0; }).length;
+
+    $("g-inning").textContent = state.over ? state.history.length : Math.min(state.history.length + 1, state.innings);
+    setGauge("g-s", last ? last.s : 0);
+    setGauge("g-b", last ? last.b : 0);
+    setGauge("g-o", outs);
+
+    $("left-label").textContent = "남은 이닝 " + Math.max(state.innings - state.history.length, 0);
+    renderSlots();
+    renderLog(newRow);
+
+    var used = {};
+    state.input.forEach(function(v){ used[v] = 1; });
+    Array.prototype.forEach.call(elKeys.children, function(k){
+      k.disabled = state.over || state.pending || !!used[k.dataset.digit] || state.input.length >= state.len;
+    });
+    $("clear").disabled = state.over || state.pending || state.input.length === 0;
+
+    var n = state.history.length ? candidates() : perms(state.len).length;
+    $("cand-label").textContent = "가능한 정답 " + n.toLocaleString("ko-KR") + "개";
+    $("hint").innerHTML = state.history.length
+      ? "지금까지의 판정과 모두 맞아떨어지는 숫자는 <b>" + n.toLocaleString("ko-KR") + "개</b> 남았습니다."
+      : "첫 투구 전 후보는 <b>" + perms(state.len).length.toLocaleString("ko-KR") + "개</b>입니다. 1~9에서 서로 다른 숫자 " + state.len + "개를 고릅니다.";
+
+    var best = readBest();
+    $("best").textContent = best ? "최소 기록 " + best + "이닝" : "";
+
+    Array.prototype.forEach.call(document.querySelectorAll(".seg button"), function(b){
+      b.setAttribute("aria-pressed", String(Number(b.dataset.len) === state.len));
+    });
+
+    var over = $("over");
+    over.hidden = !state.over;
+    if (state.over){
+      $("over-big").textContent = state.won ? "경기 종료 · 승" : "경기 종료 · 패";
+      $("over-big").className = "big " + (state.won ? "win" : "lose");
+      $("over-text").innerHTML = state.won
+        ? state.history.length + "이닝 만에 정답 <b>" + state.secret.split("").join(" ") + "</b>을 맞혔습니다."
+        : "정답은 <b>" + state.secret.split("").join(" ") + "</b> 였습니다.";
+    }
+  }
+
+  function setGauge(id, v){
+    var el = $(id);
+    el.textContent = v;
+    el.className = "v" + (v ? "" : " dim");
+  }
+
+  function say(text){ $("msg").textContent = text || ""; }
+
+  function press(d){
+    if (state.over || state.pending) return;
+    if (state.input.length >= state.len) return;
+    if (state.input.indexOf(d) !== -1) { say("같은 숫자는 한 번만 쓸 수 있습니다."); return; }
+    state.input.push(d);
+    say("");
+    if (state.input.length === state.len){
+      state.pending = true;
+      render();
+      setTimeout(function(){ state.pending = false; submit(); }, 200);
+    } else {
+      render();
+    }
+  }
+
+  function submit(){
+    if (state.over || state.input.length !== state.len) return;
+    var guess = state.input.join("");
+    if (state.history.some(function(h){ return h.guess === guess; })){
+      say(guess.split("").join(" ") + "은 이미 던진 공입니다. 다시 입력하세요.");
+      state.input = [];
+      render();
+      return;
+    }
+    var r = judge(state.secret, guess);
+    state.history.push({ guess:guess, s:r.s, b:r.b });
+    state.input = [];
+    if (r.s === state.len){
+      state.over = true; state.won = true;
+      var best = readBest();
+      if (!best || state.history.length < best) writeBest(state.history.length);
+      say("");
+    } else if (state.history.length >= state.innings){
+      state.over = true; state.won = false;
+      say("");
+    } else {
+      say(r.s === 0 && r.b === 0 ? "아웃. 이 숫자들은 모두 아닙니다." : r.s + "스트라이크 " + r.b + "볼.");
+    }
+    render(true);
+  }
+
+  elKeys.addEventListener("click", function(e){
+    var b = e.target.closest(".key");
+    if (b && !b.disabled) press(Number(b.dataset.digit));
+  });
+  $("clear").addEventListener("click", function(){ state.input = []; say(""); render(); });
+  $("again").addEventListener("click", function(){ reset(state.len); say(""); });
+  Array.prototype.forEach.call(document.querySelectorAll(".seg button"), function(b){
+    b.addEventListener("click", function(){ reset(Number(b.dataset.len)); say(""); });
+  });
+  document.addEventListener("keydown", function(e){
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key >= "1" && e.key <= "9") { press(Number(e.key)); e.preventDefault(); }
+    else if (e.key === "Backspace") { if (!state.over && !state.pending) { state.input.pop(); say(""); render(); } e.preventDefault(); }
+    else if (e.key === "Enter") { if (state.over) reset(state.len); e.preventDefault(); }
+  });
+
+  function start(data){
+    if (data && data.secret && data.secret.length){
+      state.len = data.len; state.innings = data.innings; state.secret = data.secret;
+      state.input = data.input || []; state.history = data.history || [];
+      state.over = !!data.over; state.won = !!data.won; state.pending = false;
+      render();
+    } else {
+      reset(3);
+    }
+  }
+  if (window.claude && window.claude.hot && window.claude.hot.snapshot){
+    window.claude.hot.snapshot(function(){ return state; });
+  }
+  if (window.claude && window.claude.hot && window.claude.hot.ready) window.claude.hot.ready(start);
+  else start((window.claude && window.claude.hot && window.claude.hot.data) || {});
+})();
+</script>
+</body>
+</html>
