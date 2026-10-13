@@ -1,16 +1,30 @@
-# 부서별 데일리 모니터링 — 매일 08:25 KST
+# 부서별 데일리 모니터링 — 08시 통합 브리핑 루틴에 통합됨
 
-- 설정 페이지: https://claude.ai/artifact/MaDYnjAE4cX9Lm311TkRoK
+- **현재 실행 주체: `아침 통합 브리핑 + 부서별 모니터링 (8시 KST)` 트리거 `trig_01V94gty1FiT2gGfApxpkT53` (cron `0 23 * * *` UTC).**
+  그 트리거의 프롬프트 `[C]` 절이 이 문서의 내용을 담고 있다. 한 세션이 메일 두 통을 보낸다 —
+  `[아침 브리핑]`을 먼저, 그 다음 `[부서별 모니터링]`. **[C]는 조사를 다시 하지 않고** 첫 메일에서
+  확인한 지표·기사를 부서 각도로 재가공한다.
+- 설정 페이지: https://claude.ai/artifact/MaDYnjAE4cX9Lm311TkRoK (계속 유효. 부서 선택·발송 여부·수신 주소)
 - 설정 위치: 위 아티팩트의 DB, collection `config`, doc `monitoring`
-- 대체 설정: `routines/dept-monitoring-defaults.json` (DB를 못 읽을 때만)
-- 트리거 ID: `trig_014sDLa1VZYiPpaUHGVc2XFX` (cron `25 23 * * *` UTC)
-- 기존 `아침 통합 브리핑`(08:00, `trig_01V94gty1FiT2gGfApxpkT53`)과 **별개**로 돌아간다.
+- 대체 설정: 트리거 프롬프트 C-1에 하드코딩(재무회계·자금·Risk·일반계정운용). 저장소 JSON은 더 이상 읽히지 않는다 — 08시 세션에는 저장소가 붙지 않는다.
+- 독립 트리거 `trig_014sDLa1VZYiPpaUHGVc2XFX`는 **비활성**으로 두었다(이름에 `[08시 루틴에 통합·중단]` 표시). 지우지 않았으므로 되돌릴 수 있다.
 
-> **확인됨(10/13) — Gmail 커넥터 미연결로 미발송.** 10월 13일 08:25 회차가 실제로 실행됐고(run SUCCEEDED, 세션 `cse_01DgELCCH68vn5BbrsWBXVVo`, 74초), 그 세션의 도구 목록에 `mcp__Gmail__*`이 하나도 없었다. 같은 날 08:00 통합 브리핑은 메일이 정상 발송됐다 — 그 트리거는 `mcp_connections`에 Gmail을 갖고 있다. 즉 계정의 Gmail 연결 문제가 아니라 **이 루틴에 커넥터가 붙어 있지 않은 것**이 원인이다. `create_trigger`/`update_trigger`의 `connectors` 파라미터는 이 조직에서 거부된다("not available for this organization"), 따라서 도구로는 붙일 수 없다.
->
-> **미결 — Gmail 커넥터.** 이 루틴은 `create_trigger`로 만들어 커넥터가 비어 있다(`mcp_connections: []`). 그 상태로는 브리핑은 만들어져도 **메일이 나가지 않는다.** claude.ai 설정의 Routines에서 이 루틴에 Gmail을 연결해야 발송이 된다. 조직 설정상 도구로는 커넥터를 붙일 수 없다.
+## 왜 통합했나 (2026-10-13)
 
-아래가 루틴에 저장된 프롬프트 본문이다.
+독립 트리거는 커넥터가 비어 있어(`mcp_connections: []`) 메일을 보낼 수 없었다. 10월 13일 08:25 회차가
+실행은 됐으나(run SUCCEEDED, 세션 `cse_01DgELCCH68vn5BbrsWBXVVo`, 74초) 그 세션의 도구 목록에
+`mcp__Gmail__*`이 없었다. 같은 날 08:00 통합 브리핑은 Gmail을 가진 트리거라 정상 발송됐다.
+
+도구로 커넥터를 붙이는 두 경로가 모두 막혀 있다.
+- `connectors` 파라미터 명시 → `"the connectors parameter is not available for this organization"`
+- 파라미터 없이 생성해 세션에서 상속 → `[]`. 서버 경고: *"Connectors on triggers created via this tool
+  are limited to those the calling session itself holds; this call had none to pass through."*
+
+그래서 Gmail을 이미 가진 08시 트리거에 얹었다. 커넥터를 다시 붙일 수 있게 되면 독립 트리거를 되살리고
+08시 트리거의 `[C]` 절을 떼면 된다.
+
+아래 본문은 **독립 트리거 시절의 프롬프트 원본**이다. 되돌릴 때의 기준이며, 현재 실행되는 것은 아니다.
+08시 트리거의 `[C]` 절이 이 내용을 요약·이식한 형태다.
 
 ---
 
