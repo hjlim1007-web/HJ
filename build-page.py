@@ -7,24 +7,30 @@ baseball.html을 수정한 뒤 `python3 build-page.py`를 실행하면 index.htm
 """
 import pathlib
 
-DESC = "1~9 중 서로 다른 숫자를 스트라이크·볼 판정만으로 9이닝 안에 맞히는 숫자야구 게임."
-SRC = pathlib.Path(__file__).with_name("baseball.html")
-OUT = pathlib.Path(__file__).with_name("index.html")
+PAGES = [
+    ("baseball.html", "index.html", "숫자야구 전광판",
+     "1~9 중 서로 다른 숫자를 스트라이크·볼 판정만으로 9이닝 안에 맞히는 숫자야구 게임."),
+    ("lightsout.html", "lights-out.html", "라이트 아웃",
+     "한 칸을 누르면 상하좌우가 함께 뒤집히는 전구판을 모두 끄는 논리 퍼즐. 남은 최소 클릭 수를 실시간으로 계산한다."),
+]
 
-body = SRC.read_text(encoding="utf-8")
-head, _, rest = body.partition("</style>")
-head += "</style>"
 
-OUT.write_text(f"""<!doctype html>
+def build(src_name, out_name, title, desc):
+    src = pathlib.Path(__file__).with_name(src_name)
+    out = pathlib.Path(__file__).with_name(out_name)
+    body = src.read_text(encoding="utf-8")
+    head, _, rest = body.partition("</style>")
+    head += "</style>"
+    out.write_text(f"""<!doctype html>
 <html lang="ko">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="{DESC}">
+<meta name="description" content="{desc}">
 <meta name="color-scheme" content="light dark">
 <meta property="og:type" content="website">
-<meta property="og:title" content="숫자야구 전광판">
-<meta property="og:description" content="{DESC}">
+<meta property="og:title" content="{title}">
+<meta property="og:description" content="{desc}">
 <style>
 /* 아티팩트 런타임이 붙여 주는 기본 리셋과 동일 */
 :root{{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}}
@@ -39,4 +45,8 @@ img{{max-width:100%}}
 </body>
 </html>
 """, encoding="utf-8")
-print(f"wrote {OUT.name} ({OUT.stat().st_size:,} bytes)")
+    print(f"wrote {out.name} ({out.stat().st_size:,} bytes)")
+
+
+for args in PAGES:
+    build(*args)
